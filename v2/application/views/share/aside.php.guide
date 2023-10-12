@@ -1,0 +1,103 @@
+<?php
+$url = dirname(dirname(__FILE__));
+require_once $url . "/promotion/jssdk_for_socialsale.php";
+$jssdk = new JSSDK("wx263ecb5448276cfb", "db21376b52d52dce6f704cc0f249b4f8");
+$signPackage = $jssdk->GetSignPackage();
+?>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta name="format-detection" content="telephone=no">
+        <title>店面推广</title>
+
+
+        <link rel="stylesheet" type="text/css" href="https://www.chilink.com.cn/assets/css/amazeui.min.css" />
+        <script src="https://www.chilink.com.cn/assets/js/jquery-1.7.1.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://www.chilink.com.cn/assets/js/amazeui.min.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="https://www.chilink.com.cn/assets/js/jweixin-1.0.0.js"></script>
+        <style>
+
+        .ui-list-info p{
+          color: #080808fa ;
+        }
+
+        </style>
+
+        <script>
+            var uid = 0;
+
+            var courseid=0;
+
+            var havecard='';
+
+            var user_credit='';
+
+            var is_weixin = 0;
+
+            var cardno='';
+
+        <?php
+echo "uid = " . intval($userid) . ";";
+
+echo "agentid = " . intval($agentid) . ";";
+
+echo "havecard = '" . $havecard . "';";
+
+echo "cardno = '" . $cardno . "';";
+
+echo "user_credit = '" . $user_credit . "';";
+
+echo "is_weixin=" . intval($is_weixin) . ";";
+?>
+
+          $(document).ready(function(){
+            {
+                if( is_weixin ==1){
+
+                     if(uid < 1){
+                           window.location="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx3f05278e02953c17"+
+                            "&redirect_uri=https%3A%2F%2Fweb.golf-brother.com%2Fweixin%2Fwxcallback%2F"+
+                            "&response_type=code&scope=snsapi_userinfo&state=13#wechat_redirect"
+                            return;
+                 }
+
+                  show_user_profile();
+
+                } else{
+                  alert('请在微信打开')
+                }
+            }
+
+          });
+
+
+            function show_user_profile(){
+                var tpl='<div>'+'球场id'+courseid+'<br/>用户id:'+uid+'<br/>是否有卡:'+havecard+'<br/>用户余额:'+user_credit+'<br/>卡号:'+cardno+'</div>'
+                var last = $('#userprofile').last();
+                $(tpl).appendTo(last);
+
+            }
+
+
+        </script>
+    </head>
+    <body ontouchstart>
+
+
+
+<section class="am-panel am-panel-default">
+  <header class="am-panel-hd">
+    <h3 class="am-panel-title">用户余额</h3>
+  </header>
+  <div class="am-panel-bd" id="userprofile">
+
+  </div>
+</section>
+
+
+
+
+    </body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "require": {
+    "phpoffice/phpspreadsheet": "^1.16",
+    "php": ">=5.3.7",
+    "league/pipeline": "^1.0"
+  }
+}

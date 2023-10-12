@@ -1,0 +1,10 @@
+./.gitignore
+./logs
+logs/
+./upload
+upload/
+download/
+./download
+api_dev.sh
+j.sh
+./.vscode
