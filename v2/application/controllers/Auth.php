@@ -170,7 +170,7 @@ class Auth extends MY_Controller {
     $trylogin = $this->db_login($mobile, $password);
     // $trylogin = 'success';
     if (!('success' == $trylogin)) {
-      $ret = array('code' => 401, 'message' => 'node:[mobile/password] not match');
+      $ret = array('code' => 401, 'message' => 'Message:[mobile/password] not match');
       http_response_code(401);
       echo json_encode($ret);
       return false;
