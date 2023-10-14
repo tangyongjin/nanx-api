@@ -133,4 +133,7 @@ $autoload['language'] = array();
 |	$autoload['model'] = array('first_model' => 'first');
  */
 
-$autoload['model'] = ['MUser', 'MPermission', 'MExcel', 'MDataGrid', 'MCurd', 'MRdbms', 'MMenu'];
+$autoload['model'] = [
+    'MUser', 'MPermission', 'MExcel', 'MDataGrid', 'MCurd', 'MRdbms', 'MMenu',
+    'MDataGridCfgAssemble', 'MDataGridCfgExecutor', 'MFieldcfg'
+];

@@ -108,12 +108,7 @@ class Permission extends MY_Controller {
     );
     $this->db->insert('nanx_user_role', $data);
     $inset_res = $this->db->insert_id();
-    if (count($inset_res) >= 0) {
-      $ret = array('code' => 200, 'msg' => 'success');
-    }
-    if (count($inset_res) < 0) {
-      $ret = array('code' => 400, 'msg' => 'error');
-    }
+    $ret = array('code' => 200, 'msg' => 'success');
     echo json_encode($ret);
   }
 
@@ -157,37 +152,12 @@ class Permission extends MY_Controller {
     $part = $this->MPermission->addSqlPart($args);
     $rows = $this->MPermission->getRoleListsIsAddCondition($part, $page, $size);
     $total = $this->MPermission->queryCount($part);
-    if (count($rows) >= 0) {
-      $ret = array('code' => 200, 'msg' => 'success', 'data' => $rows, 'total' => $total);
-    }
-    if (count($rows) < 0) {
-      $ret = array('code' => 400, 'msg' => 'error', 'data' => array(), 'total' => 0);
-    }
+    $ret = array('code' => 200, 'msg' => 'success', 'data' => $rows, 'total' => $total);
     echo json_encode($ret);
   }
 
 
-
-  public function updateMenu() {
-    $this->load->model('MPermission');
-    $args = (array) json_decode(file_get_contents('php://input'));
-
-    $id = $args['id'];
-    $data = $this->MPermission->insertMenu($args);
-
-    $this->db->where('id', $id);
-    $this->db->update('boss_portal_menu_list', $data);
-    $err = $this->db->error();
-
-    if (0 == $err['code']) {
-      $ret = array('code' => 200, 'msg' => 'success');
-    } else {
-      $ret = array('code' => 400, 'msg' => $err['message']);
-    }
-    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-  }
-
-  public function saveMenuPermissions() {
+  public function saveMenuPermission() {
     $args = (array) json_decode(file_get_contents('php://input'));
     $this->load->model('MPermission');
     $state = $args['state'];
@@ -195,7 +165,7 @@ class Permission extends MY_Controller {
     $menu_id = $args['menu_id_list'];
 
     if ('insert' == $state) {
-      $ret = $this->MPermission->addMenu($role, $menu_id, 'boss_portal_role_menu_permissions');
+      $ret = $this->MPermission->addRoleMenu($role, $menu_id, 'boss_portal_role_menu_permissions');
       echo json_encode($ret);
       return;
     }
@@ -204,7 +174,5 @@ class Permission extends MY_Controller {
       echo json_encode($ret);
       return;
     }
-    $ret = array('code' => 400, 'msg' => 'error');
-    echo json_encode($ret);
   }
 }

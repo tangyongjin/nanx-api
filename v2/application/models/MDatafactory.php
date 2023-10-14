@@ -70,22 +70,15 @@ class MDatafactory extends CI_Model {
 
 
     $qucik = $this->QuickSql($sql);
-    // debug($qucik);
-    // die();
     $all_rows = $this->db->query($qucik)->result_array();
-    // debugtime('2:sql count end');
 
     $total = count($all_rows);
-
-
-    // $all_rows = $this->db->query($sql)->result_array();
-    // $total = count($all_rows);
 
     if ($pageSize != "" || $pageSize != null) {
       $sql   = $sql . " limit $start,$pageSize";
     }
-    // debug($sql);
     $rows          = $this->db->query($sql)->result_array();
+    $data = [];
     $data['rows']  = $rows;
     $data['total'] = $total;
     $data['table'] = $table;

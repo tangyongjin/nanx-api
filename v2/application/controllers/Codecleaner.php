@@ -43,11 +43,21 @@ class Codecleaner extends CI_Controller {
 
         $this->load->library('controllerlist');
 
-        $controller_funcs = $this->controllerlist->getControllers();
-        $controllers = array_keys($controller_funcs);
+        $controllersArray = $this->controllerlist->getControllers();
+        $controllers = array_keys($controllersArray);
+
+        // debug($controllersArray);
+        // die;
+
+        // $controllers = ['DataGridCfg'];
+        // $controllers = ['Curd'];
+
+
         $cms = [];
         foreach ($controllers as $controller) {
-            $methods = $controller_funcs[$controller];
+            $methods = $controllersArray[$controller];
+
+            // debug($methods);
             foreach ($methods as $onemethod) {
                 $tmp =   $controller . '/' . $onemethod;
                 $cms[] = $tmp;

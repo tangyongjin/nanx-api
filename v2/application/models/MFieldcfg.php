@@ -246,7 +246,6 @@ class MFieldcfg extends CI_Model {
 
     // 所有的隐藏字段,包括 form_hidden / column_hidden
     function getForbiddenFields($activty_code, $type = null) {
-
         if ($type === null) {
             $this->db->where(['datagrid_code' => $activty_code]);
             $rows             = $this->db->get('nanx_activity_forbidden_field')->result_array();

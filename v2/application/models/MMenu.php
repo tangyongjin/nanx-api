@@ -52,13 +52,9 @@ class MMenu extends CI_Model {
             ORDER BY wl.listorder";
 
         $three_row = $this->db->query($three_sql)->result_array();
-        if (count($three_row) >= 0) {
-          $row[$j]['children'] = $three_row;
-        }
+        $row[$j]['children'] = $three_row;
       }
-      if (count($row) >= 0) {
-        $res[$i]['children'] = $row;
-      }
+      $res[$i]['children'] = $row;
     }
     return $res;
   }
@@ -114,14 +110,9 @@ class MMenu extends CI_Model {
                 from  boss_portal_menu_list wl  
                 where   wl.parent_id='$three' ORDER BY wl.id";
         $three_row = $this->db->query($three_sql)->result_array();
-
-        if (count($three_row) >= 0) {
-          $row[$j]['children'] = $three_row;
-        }
+        $row[$j]['children'] = $three_row;
       }
-      if (count($row) >= 0) {
-        $res[$i]['children'] = $row;
-      }
+      $res[$i]['children'] = $row;
     }
     return $res;
   }

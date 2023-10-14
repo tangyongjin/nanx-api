@@ -73,9 +73,12 @@ class ControllerList {
           $subdircontrollername = basename($subdircontroller, $this->CI->EXT);
 
           // Load the controller file in memory if it's not load already
-          if (!class_exists($subdircontrollername)) {
-            $this->CI->load->file($subdircontroller);
-          }
+          $this->CI->load->file($subdircontroller);
+
+          // if (!class_exists($subdircontrollername)) {
+          //   $this->CI->load->file($subdircontroller);
+          // }
+
           $aMethods = array_diff(get_class_methods($subdircontrollername), get_class_methods('MY_Controller'));
           $aUserMethods = array();
 
