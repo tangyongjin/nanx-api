@@ -38,43 +38,6 @@ class MFieldcfg extends CI_Model {
             'year'
         );
 
-
-        $data_types_have_length = array(
-            'bigint',
-            'binary',
-            'bit',
-            'blob',
-            'bool',
-            'boolean',
-            'char',
-            'date',
-            'datetime',
-            'decimal',
-            'double',
-            'enum',
-            'float',
-            'int',
-            'longblob',
-            'longtext',
-            'mediumblob',
-            'mediumint',
-            'mediumtext',
-            'numeric',
-            'real',
-            'set',
-            'smallint',
-            'text',
-            'time',
-            'timestamp',
-            'tinybolb',
-            'tinyint',
-            'tinytext',
-            'varbinary',
-            'varchar',
-            'year'
-        );
-
-
         $data_types_need_wrapper = array(
             'char',
             'date',
@@ -106,7 +69,7 @@ class MFieldcfg extends CI_Model {
 
 
         foreach ($all_db_fields as $db_field) {
-            $display_cfg            = $this->getDisplayCfg($datagrid_code, $base_table, $db_field, $transfer);
+            $display_cfg            = $this->getDisplayCfg($base_table, $db_field, $transfer);
             $editor_cfg             = $this->getEditorCfg($datagrid_code, $base_table, $db_field);
             $tmp_cfg['field_e']     = $db_field['Field'];
             $tmp_cfg['display_cfg'] = $display_cfg;
@@ -119,7 +82,7 @@ class MFieldcfg extends CI_Model {
 
 
     //transfer = 是否需要转换
-    function getDisplayCfg($datagrid_code, $base_table, $db_field, $transfer) {
+    function getDisplayCfg($datagrid_code,   $db_field, $transfer) {
         if (!$transfer) {
             return array(
                 'field_c' => $db_field['Field'],
@@ -138,13 +101,11 @@ class MFieldcfg extends CI_Model {
             if (strlen($row['field_c']) == 0) {
                 $row['field_c'] = $db_field['Field'];
             }
-            // $row['value'] = $db_field;
             return $row;
         }
 
 
         $field_comment = $db_field['Comment'];
-
         if (strlen($field_comment) > 1) {
             $field_c = $field_comment;
         } else {

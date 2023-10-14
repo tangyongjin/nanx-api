@@ -18,15 +18,15 @@ class Rdbms extends MY_Controller {
         $optype = $para_array['optype'];
 
         if (('NANX_TBL_DATA' == $optype) || ('NANX_SYS_CONFIG' == $optype)) {
-            $sqls = $this->data_adu($para_array);
+            $this->data_adu($para_array);
         }
 
         if ('NANX_TBL_STRU' == $optype) {
-            $sqls = $this->tb_structure_adu($para_array);
+            $this->tb_structure_adu($para_array);
         }
 
         if ('NANX_TBL_INDEX' == $optype) {
-            $sqls = $this->tb_index_adu($para_array);
+            $this->tb_index_adu($para_array);
         }
     }
 
@@ -84,13 +84,10 @@ class Rdbms extends MY_Controller {
 
     public function getAllBiztable() {
         $tables = $this->db->list_tables();
-
         $fixed = [];
-
         foreach ($tables as $one) {
             $fixed[] = ['value' => $one, 'text' => $one];
         }
-
         $ret = ['code' => 200, 'data' => $fixed];
         echo json_encode($ret);
     }

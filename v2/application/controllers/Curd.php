@@ -172,9 +172,6 @@ class Curd extends MY_Controller {
 
     //翻译 字段不能为空的错误信息
     public function transErrorMsg($table, $resp) {
-        logtext('transerror');
-        logtext($table);
-        logtext($resp);
 
 
         //字段不能为空的错误

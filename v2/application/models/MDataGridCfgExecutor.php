@@ -61,7 +61,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
             $btns[] = $one_btn;
         }
 
-        $specialbtns = $this->getSpecialButtons($this->payload['DataGridCode'], $this->payload['role']);
+        $specialbtns = $this->getSpecialButtons();
         foreach ($specialbtns as $value) {
             $btns[] = $value;
         }
@@ -86,12 +86,9 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         $this->payload['formHiddenColumns'] =  $this->MFieldcfg->getForbiddenFields($this->payload['DataGridCode'], 'form_hidden');
     }
 
-    public function getSpecialButtons($datagrid_code, $role_code) {
+    public function getSpecialButtons() {
         return [];
     }
-
-
-
 
 
     public function setTableColumnConfig() {
@@ -109,7 +106,6 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
 
     public function setUFormConfig() {
-
         $this->payload['formcfg'] = $this->transUniFormformCfg($this->payload['fmsCfg']);
     }
 

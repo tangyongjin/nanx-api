@@ -1,16 +1,14 @@
 <?php
+
 class MDatafactory extends CI_Model {
-  function getSqlByActCode($actcode, $basetable, $id_order) {
+  public function getSqlByActCode($actcode, $basetable, $id_order) {
 
     $this->db->where(['actcode' => $actcode]);
     $this->db->select('base_table,field_e,codetable_category_value,combo_table,list_field,value_field,filter_field,group_id,level');
     $combo_fields = $this->db->get('nanx_biz_column_trigger_group')->result_array();
-
-
     $transed_fields = [];
     $joins         = [];
     $ghosts        = [];
-
     $field_list_str = '';
     $join_str       = '';
     $ghosts_str     = '';
@@ -52,18 +50,15 @@ class MDatafactory extends CI_Model {
 
 
 
-  function getDatabyBasetable($actcode, $table, $id_order, $query_cfg, $start, $pageSize, $currentUser) {
+  public function getDatabyBasetable($actcode, $table, $id_order, $query_cfg, $start, $pageSize, $currentUser) {
 
     $sqlobj = $this->getSqlByActCode($actcode, $table, $id_order);  // 已经联合查询下拉trigger
-    $sql      = $sqlobj['sql'];
+    $sql = $sqlobj['sql'];
 
 
     if ($query_cfg) {
-      $sql          = $this->buildSql_with_query_cfg($sqlobj['transed_fields'],  $table, $sql, $query_cfg);
+      $sql = $this->buildSql_with_query_cfg($sqlobj['transed_fields'], $table, $sql, $query_cfg);
     }
-
-
-
 
     $sql = $this->add_sql_author($sql, $table, $currentUser);
     logtext($sql);
@@ -86,30 +81,17 @@ class MDatafactory extends CI_Model {
     return $data;
   }
 
-  function  QuickSql($sql) {
-    // return $sql ;
-    // 首先以逗号分割.
-
+  public function QuickSql($sql) {
     $arr_1 = explode(',', $sql);
-
     $arr_2 = explode(' from ', $sql);
-
-    // debug($arr_1);
-    // debug($arr_2);
-
     $quick_sql = $arr_1[0] . " from " . $arr_2[1];
-    // echo $quick_sql;
     return $quick_sql;
   }
 
 
 
-
-
-
   // 根据作者字段筛选数据.
-  function add_sql_author($sql, $table, $currentUser) {
-
+  public function add_sql_author($sql, $table, $currentUser) {
     if ($currentUser == 'admin' ||  $currentUser == 'super') {
       return $sql;
     }
@@ -125,11 +107,11 @@ class MDatafactory extends CI_Model {
     $this->load->model('MOrganization');
     $scopes = $this->MOrganization->getUserScope($currentUser);
     $scopes_str = array_to_string($scopes, "'");
-    $pointer = strrpos($sql, 'order', 0);  // 最后一次出现的位置 
+    $pointer = strrpos($sql, 'order', 0);  // 最后一次出现的位置
 
 
     if (strpos($sql, 'where') == false) {
-      //如果sql中没有where ,则使用where 
+      //如果sql中没有where ,则使用where
       $scopes_str =  " where   $table" . ".author in  ( $scopes_str )  ";
     } else {
       $scopes_str =  " and   $table" . ".author in  ( $scopes_str )  ";
@@ -144,9 +126,6 @@ class MDatafactory extends CI_Model {
 
   //在transed_fields 寻找替换后的 带下划线的表名,返回 tablename_?.col
   public function seekTransferred($transed_fields, $table, $field) {
-
-
-    // debug($transed_fields);
 
     $found = 'AAAA'; //如果出现就是错误了.
     foreach ($transed_fields as $one) {
@@ -167,13 +146,9 @@ class MDatafactory extends CI_Model {
 
 
 
-  function buildSql_with_query_cfg($transed_fields, $table, $sql, $query_cfg) {
-
+  public function buildSql_with_query_cfg($transed_fields, $table, $sql, $query_cfg) {
     $count = $query_cfg['count'];
     $lines   = $query_cfg['lines'];
-
-
-
     $all_fields = $this->db->query("show full fields from  $table")->result_array();
     $all_fields = array_retrieve($all_fields, array(
       'Field',
@@ -238,7 +213,7 @@ class MDatafactory extends CI_Model {
 
 
 
-  function getDatabySql($sql) {
+  public function getDatabySql($sql) {
 
     $data = array();
     $this->load->model('MDataGrid');

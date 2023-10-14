@@ -24,7 +24,6 @@ class MExcel extends CI_Model {
     }
 
     $total[] = $header;
-
     foreach ($records as $index => $record) {
       $tmp = [];
       foreach ($cols as $col) {
@@ -45,10 +44,8 @@ class MExcel extends CI_Model {
 
     // 使用header 作为 cols,
     $cols = array_keys($header);
-    // debug($cols);
 
     foreach ($total as $index => $record) {
-      // $key = $cols[$index];
       $index++;
       foreach ($cols as $cellindex => $col) {
         $cellname = $cellNames[$cellindex];
@@ -85,8 +82,7 @@ class MExcel extends CI_Model {
     } else {
       $spreadsheet->setActiveSheetIndexByName($sheet_index);
     }
-
-    $all_sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, $formatData = false, false);
+    $all_sheetData = $spreadsheet->getActiveSheet()->toArray(null, true,  false, false);
     return $all_sheetData;
   }
 }

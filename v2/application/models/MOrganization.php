@@ -2,7 +2,6 @@
 
 class MOrganization  extends CI_Model {
 
-  //约定:用户以邮箱前缀为准, like :chenlei
 
 
   public function __construct() {
@@ -29,13 +28,7 @@ class MOrganization  extends CI_Model {
 
   //获取部门所有用户
   public function getDeptMembers($deptid) {
-
-
-    //username
-
     $sql = "select user,staff_name as username from   nanx_user     where  deptid= $deptid ";
-
-
     $rows =  $this->db->query($sql)->result_array();
     return $rows;
   }
