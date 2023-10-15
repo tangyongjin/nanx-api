@@ -65,7 +65,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         foreach ($specialbtns as $value) {
             $btns[] = $value;
         }
-        $this->payload['notStandardButtonConfig'] =  $btns;
+        $this->payload['buttons'] =  $btns;
     }
 
 
