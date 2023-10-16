@@ -64,11 +64,6 @@ class Permission extends MY_Controller {
     echo json_encode($ret);
   }
 
-
-
-
-
-
   public function getRolesByMenuId() {
     $args = (array) json_decode(file_get_contents("php://input"));
     $menuId = $args['menu_id'];
@@ -106,36 +101,9 @@ class Permission extends MY_Controller {
     echo json_encode($ret);
   }
 
-  public function deleteRole() {
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $id = $args['id'];
-    $this->db->delete('nanx_user_role', array('id' => $id));
-    $err = $this->db->error();
-    if (0 == $err['code']) {
-      $ret = array('code' => 200, 'msg' => '操作成功');
-    } else {
-      $ret = array('code' => 400, 'msg' => $err['message']);
-    }
-    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-  }
 
-  public function updateRole() {
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $id = $args['key'];
-    $data = array(
-      'role_code' => $args['role_code'],
-      'role_name' => $args['role_name'],
-    );
-    $this->db->where('id', $id);
-    $this->db->update('nanx_user_role', $data);
-    $err = $this->db->error();
-    if (0 == $err['code']) {
-      $ret = array('code' => 200, 'msg' => 'success');
-    } else {
-      $ret = array('code' => 400, 'msg' => 'error');
-    }
-    echo json_encode($ret);
-  }
+
+
 
   public function getRoleList() {
     $args = (array) json_decode(file_get_contents('php://input'));

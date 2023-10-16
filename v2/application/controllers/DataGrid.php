@@ -185,25 +185,6 @@ class DataGrid extends MY_Controller {
   }
 
 
-  public function addActionButton() {
-    $json_paras = (array) json_decode(file_get_contents('php://input'), true);
-
-    // debug($json_paras);
-    $this->db->insert('nanx_grid_button', $json_paras);
-
-    $db_error = $this->db->error();
-    $ret = [];
-    if ($db_error['code'] > 0) {
-      $ret['code'] = 500;
-      $ret['message'] = "添加按钮错误:" . $db_error['message'];
-    } else {
-      $ret['code'] = 200;
-      $ret['message'] = "添加按钮成功";
-    }
-    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-  }
-
-
   public function addDataGridCode() {
     $json_paras = (array) json_decode(file_get_contents('php://input'), true);
     $json_paras['datagrid_type'] = 'table';
