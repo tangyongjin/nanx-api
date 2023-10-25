@@ -69,11 +69,7 @@ class MGridDataPipe extends CI_Model implements StageInterface {
             $this->payload['query_cfg']['count'] =  $_query_cfg['count'];
             $tmp_lines = (array) $_query_cfg['lines'];
             // 第一行的  and_or_0 设置为空格,作为修正
-            if ($_query_cfg['count']  == 1) {
-                $tmp_lines['and_or_0'] = '';
-            } else {
-                $tmp_lines[0]['and_or_0'] = '';
-            }
+            $tmp_lines['and_or_0'] = '';
             $this->payload['query_cfg']['lines'] =  $tmp_lines;
         }
     }
@@ -175,55 +171,54 @@ class MGridDataPipe extends CI_Model implements StageInterface {
         for ($i = 0; $i < $count; $i++) {
 
             $and_or = $lines['and_or_' . $i];
-            if ($i == 0) {
-                $and_or = '';  // 去除第一个的 and_or 字符串.
-            }
-
-
-
-            $field = $lines['field_' . $i];
+            $operator = $lines['operator_' . $i];
             $wrapp_text = "'";  // 全部包装起来, 即使是数字类型的.
+
             $field_in_line = $lines['field_' . $i];
             $arg      = $lines['vset_' . $i];
+            $pair = $this->getQueryPair($field_in_line, $arg);
 
-            $this->db->where(['actcode' =>  $this->payload['DataGridCode'], 'field_e' => $field_in_line]);
-            $triggercfg = $this->db->get('nanx_biz_column_trigger_group')->result_array();
-
-            $index = array_search($field_in_line, array_column($this->payload['combo_fields'], 'field_e'));
-            if ($index !== false) {
-                $triggercfg = $this->payload['combo_fields'][$index];
-                if ($triggercfg['combo_table'] == 'nanx_code_table') {
-                    $this->db->where(['category' => $triggercfg['codetable_category_value'], 'display_text' => $lines['vset_' . $i]]);
-                    $code_found_row = $this->db->get('nanx_code_table')->row_array();
-                    $used_codetable_value   = $code_found_row['value'];
-                    $field = $lines['field_' . $i];
-                    $arg      = $used_codetable_value;
-                    // debug($arg); // 男 = >1
-
-                } else {
-                    $field = $this->seekTransformered($triggercfg['combo_table'], $triggercfg['list_field']);
-                }
-            } else {
-                $field = $this->payload['base_table'] . "." . $field_in_line;
-            }
-
-
-            $operator = $lines['operator_' . $i];
-            if ($operator == 'like') {
-                $arg = '%' . $arg . '%';
-            }
-            if ($operator == 'like_begin') {
-                $operator = 'like';
-                $arg      = $arg . '%';
-            }
-            if ($operator == 'like_end') {
-                $operator = 'like';
-                $arg      = '%' . $arg;
-            }
-            $where .= $and_or . ' (' . $field . ' ' . $operator . ' ' . $wrapp_text . $arg . $wrapp_text . ') ';
+            $where .= $and_or . ' (' . $pair['field'] . ' ' . $operator . ' ' . $wrapp_text .  $pair['argSTr'] . $wrapp_text . ') ';
         }
+
         $this->payload['where_string'] = $where;
     }
+
+
+    public function getQueryPair($field_in_line, $arg) {
+
+        $index = array_search($field_in_line, array_column($this->payload['combo_fields'], 'field_e'));
+        // 无任何下拉选项
+        if ($index === false) {
+            return [
+                'field' =>  $this->payload['base_table'] . "." . $field_in_line,
+                'argSTr' => '%' . $arg . '%',
+            ];
+        }
+
+
+        // 有下拉
+        $triggercfg = $this->payload['combo_fields'][$index];
+
+        // 如果是 code_table,category
+        if ($triggercfg['combo_table'] == 'nanx_code_table') {
+            $this->db->where(['category' => $triggercfg['codetable_category_value'], 'display_text' => $arg]);
+            $code_found_row = $this->db->get('nanx_code_table')->row_array();
+            $used_codetable_value   = $code_found_row['value'];
+            return [
+                'field' => $field_in_line,
+                'argSTr' =>   '%' . $used_codetable_value . '%',
+            ];
+        }
+
+        // 两表链接
+        return [
+            'field' => $this->seekTransformered($triggercfg['combo_table'], $triggercfg['list_field']),
+            'argSTr' =>  '%' . $arg . '%',
+        ];
+    }
+
+
 
 
     public function setSqlWithQueryCfg() {
