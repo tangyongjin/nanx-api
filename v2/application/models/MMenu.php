@@ -21,32 +21,33 @@ class MMenu extends CI_Model {
 
   public function getTreeMenuList() {
     $sql = "select   menu_role.role, 
-            wl.menu_level,wl.datagrid_code,wl.is_association_process,
-            wl.process_key, 
-            wl.badge,wl.badge_key,wl.id 'key',
-            wl.menu,wl.type,wl.text ,wl.text as title,wl.icon,
-            wl.router,
-            if(wl.is_leaf='true',true,false ) as  'isLeaf',
-            wl.parent_id
+            menu.menu_level,menu.datagrid_code,
+            menu.id 'key',
+            menu.menu,menu.type,menu.text ,menu.text as title,menu.icon,
+            menu.router,
+            if(menu.is_leaf='true',true,false ) as  'isLeaf',
+            menu.parent_id
             from 
-            boss_portal_menu_list wl
+            boss_portal_menu_list menu
             left join  boss_portal_role_menu_permissions menu_role
-            on menu_id=wl.id
-            where  parent_id is NULL ORDER BY wl.id";
+            on menu_id=menu.id
+            where  parent_id is NULL ORDER BY menu.listorder";
 
     $res = $this->db->query($sql)->result_array();
     $len1 = count($res);
     for ($i = 0; $i < $len1; ++$i) {
       $id = $res[$i]['key'];
-      $sql = "select  menu_role.role,  wl.menu_level,wl.datagrid_code,wl.is_association_process,
-            wl.process_key, wl.badge,wl.badge_key,
-            wl.id 'key',wl.menu,wl.type,wl.text ,wl.text as title,wl.icon,wl.router,
-            if(wl.is_leaf='true',true,false ) as  'isLeaf',
-            wl.parent_id 
-            from  boss_portal_menu_list wl
-            left join  boss_portal_role_menu_permissions menu_role
-            on menu_id=wl.id
-            where  wl.parent_id='$id' ORDER BY wl.id";
+      $sql = "select  menu_role.role,  
+              menu.menu_level,menu.datagrid_code,
+              menu.id 'key',
+              menu.menu,menu.type,menu.text ,menu.text as title,menu.icon,
+              menu.router,
+              if(menu.is_leaf='true',true,false ) as  'isLeaf',
+              menu.parent_id 
+              from  boss_portal_menu_list menu
+              left join  boss_portal_role_menu_permissions menu_role
+              on menu_id=menu.id
+              where  menu.parent_id='$id' ORDER BY menu.listorder";
       $rows = $this->db->query($sql)->result_array();
       $res[$i]['children'] = $rows;
     }

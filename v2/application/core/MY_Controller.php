@@ -113,16 +113,7 @@ class MY_Controller extends CI_Controller {
     return $this->user;
   }
 
-  private function setRoles($_roles) {
-    $roles = array();
-    foreach ($_roles as $value) {
-      $tmp = array(
-        'role_code' => $value->role_code,
-      );
-      $roles[] = $tmp;
-    }
-    $this->roles = $roles;
-  }
+
 
   public function getRoles() {
     return $this->roles;
@@ -134,8 +125,8 @@ class MY_Controller extends CI_Controller {
       'log/clearlog',
       'log/bpm',
       'qrcoder/img',
-      'Auth/login_mobile',
-      'Auth/login_qrscan',
+      'Auth/loginMobile',
+      'Auth/JWT_login',
       'tree/systemSummary',
       'tree/index',
       'bpm/getUserLeader',

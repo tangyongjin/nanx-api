@@ -1,8 +1,4 @@
 <?php
-
-
-
-
 if (!defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
@@ -18,26 +14,33 @@ class Curd extends MY_Controller {
         }
     }
 
-
-
-
     public function listData() {
 
         $ret = [];
         $post = file_get_contents('php://input');
         $para = (array) json_decode($post);
-        $user = $this->getUser();
-        $this->load->model('MCurd');
-        $base_table = $this->MCurd->getBasetable($para['DataGridCode']);
-        $para['table'] = $base_table;
-        $this->load->model('MCurd');
-        $result = $this->MCurd->getActivityData($user, $para);
-        $records = $result['rows'];
+
+        $get_data_config = [
+            'DataGridCode' => $para['DataGridCode'],
+            'currentPage' => $para['currentPage'],
+            'isFilterSelfData' => $para['isFilterSelfData'],
+            'pageSize' => $para['pageSize'],
+            'query_cfg' => $para['query_cfg'],
+            'role' => $para['role'],
+            'user' => $para['user']
+        ];
+
+
+
+
+        $result2  =  $this->MGridDataPipeRunner->GridDataHandler($get_data_config);
         $ret = [];
         $ret['code'] = 200;
-        $ret['data'] = $records;
-        $ret['total'] = (int) $result['total'];
-        $ret['sql'] = $result['sql'];
+        $ret['data'] = $result2['realrows'];
+        $ret['total'] = (int) $result2['total'];
+        $ret['sql'] = $result2['lastsql'];
+        $ret['debug'] = $result2;
+
         echo json_encode($ret);
     }
 
@@ -48,11 +51,9 @@ class Curd extends MY_Controller {
         $post = file_get_contents('php://input');
         $para = (array) json_decode($post);
         $actcode = $para['DataGridCode'];
-        $act_table = $this->MCurd->getBasetable($actcode);
+        $act_table = $this->MDataGrid->getBaseTableByActcode($actcode);
 
-        //检查是否是流程相关的maintable.
 
-        $user = $this->getUser();
         $flowInitMeta = [];
         $para['table'] = $act_table;
         $base_table = $para['table'];
@@ -97,7 +98,7 @@ class Curd extends MY_Controller {
         $para = (array) json_decode($post);
         $actcode = $para['DataGridCode'];
         $para['rawdata'] = $this->fix_ghost((array) $para['rawdata']);
-        $para['table'] = $this->MCurd->getBasetable($actcode);
+        $para['table'] = $this->MDataGrid->getBaseTableByActcode($actcode);
         $actcode = $para['DataGridCode'];
         $base_table = $para['table'];
         $rawData =  $para['rawdata'];
@@ -113,13 +114,6 @@ class Curd extends MY_Controller {
         }
 
         $rawData_after_null_fix = $this->MRdbms->fixNull($base_table, $rawData);
-
-
-
-
-
-
-
 
         $this->db->where('id', $id);
         $sql_mode = " SET SQL_MODE='STRICT_ALL_TABLES' ";
@@ -210,7 +204,7 @@ class Curd extends MY_Controller {
         $p = (array) json_decode($post);
         $para_for_hooks = array();
         $DataGridCode = $p['DataGridCode'];
-        $base_table = $this->MCurd->getBasetable($DataGridCode);
+        $base_table = $this->MDataGrid->getBaseTableByActcode($DataGridCode);
         $p['table'] = $base_table;
 
         $para_for_hooks['table'] = $base_table;

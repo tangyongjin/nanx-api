@@ -31,7 +31,6 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         $this->payload['DataGridMeta'] = $tmp;
         $this->payload['base_table'] = $tmp['base_table'];
         $this->payload['fixed_query_cfg'] = $tmp['fixed_query_cfg'];
-        $this->payload['layoutcfg'] = $tmp['layoutcfg'];
         $this->payload['form_title'] = $tmp['datagrid_title'];
         $this->payload['tips'] = $tmp['tips'];
         $this->payload['referino'] = [];
@@ -45,8 +44,8 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
     public function setButtonCfg() {
         $btns = [];
         $sql = "select * from nanx_grid_button where datagrid_code='{$this->payload['DataGridCode']}' order by btnorder asc  ";
-        $notStandardButtons = $this->db->query($sql)->result_array();
-        usort($notStandardButtons, function ($item1, $item2) {
+        $Buttons = $this->db->query($sql)->result_array();
+        usort($Buttons, function ($item1, $item2) {
             if (empty($item1['btnorder'])) {
                 $item1['btnorder'] = -1 * intval($item1['id']);
             }
@@ -57,7 +56,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         });
 
 
-        foreach ($notStandardButtons as $one_btn) {
+        foreach ($Buttons as $one_btn) {
             $btns[] = $one_btn;
         }
 

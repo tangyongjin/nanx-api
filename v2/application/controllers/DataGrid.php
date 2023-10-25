@@ -54,13 +54,7 @@ class DataGrid extends MY_Controller {
 
   public function exportExcel() {
 
-    // /total_cols_cfg
-    // DataGridMeta['geturl']
-
     $para = (array) json_decode(file_get_contents("php://input"));
-
-    // debug($para);
-
     $para['pageSize'] = 1000;
     $actcfg = $this->MDataGridCfgAssemble->PipeRunner($para);
 
@@ -80,176 +74,14 @@ class DataGrid extends MY_Controller {
       $para['role'] = $this->getUser();
       $para['user'] = $this->getUser();
       $para['table'] = $actcfg['DataGridMeta']['base_table'];
-      $result = $this->MCurd->getActivityData($this->getUser(), $para);
-      $records = $result['rows'];
+
+      // $result = $this->MCurd->getDataGridData($this->getUser(), $para);
+      // $records = $result['rows'];
+      $records = array();
     }
     $this->MExcel->exportExcel($actcfg['DataGridMeta']['datagrid_title'], $cols, $records);
   }
 
-  public function getFlowTplButtons() {
-
-    $btns = [
-      ['button_code' => 'BpmProcess'],
-      ['button_code' => 'bpmInfo'],
-      ['button_code' => 'viewProcess']
-    ];
-    return $btns;
-  }
-
-
-
-  public function getCRUDBtns() {
-    $btns = [
-      ['button_code' => 'addData'],
-      ['button_code' => 'editData'],
-      ['button_code' => 'deleteData'],
-      ['button_code' => 'refreshTable'],
-      ['button_code' => 'tableSearch']
-    ];
-    return $btns;
-  }
-
-
-
-  public function batchSetButtons() {
-    $json_paras = (array) json_decode(file_get_contents('php://input'), true);
-    $actioncode  = $json_paras['actioncode'];
-    $batch_type = $json_paras['batch_type'];
-
-    if ($batch_type == "reset") {
-      $this->db->delete('boss_portal_button_actcode', array('datagrid_code' => $actioncode));
-      $ret['code'] = 200;
-      $ret['msg'] = "success";
-      echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-      return;
-    }
-
-    if ($batch_type == "curd_template") {
-      $btns = $this->getCRUDBtns();
-      $ret = $this->insertBatchSetButtonOrder($btns, $actioncode);
-      echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-      return;
-    }
-
-    if ($batch_type == "flow_template") {
-      $btns = $this->getFlowTplButtons();
-      $ret  = $this->insertBatchSetButtons($btns, $actioncode);
-      echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-      return;
-    }
-
-
-    if ($batch_type == "bpmstart_template") {
-      $btns = [
-        ['button_code' => 'BpmStart']
-      ];
-      $ret = $this->insertBatchSetButtons($btns, $actioncode);
-      echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-      return;
-    }
-  }
-
-
-
-  public function insertBatchSetButtons($btns, $actioncode) {
-    for ($i = 0; $i < count($btns); $i++) {
-      $data = array(
-        'datagrid_code' => $actioncode,
-        "button_code" => $btns[$i]['button_code'],
-      );
-
-      $this->db->insert('boss_portal_button_actcode', $data);
-    }
-    $ret = [];
-    $ret['code'] = 200;
-    $ret['msg'] = "success";
-    return $ret;
-  }
-
-
-  public function insertBatchSetButtonOrder($btns, $actioncode) {
-
-    for ($i = 0; $i < count($btns); $i++) {
-      $data = array(
-        'datagrid_code' => $actioncode,
-        "button_code" => $btns[$i]['button_code'],
-        "btnorder"    => $i + 1
-      );
-
-      $this->db->insert('boss_portal_button_actcode', $data);
-    }
-    $ret = [];
-    $ret['code'] = 200;
-    $ret['msg'] = "success";
-    return $ret;
-  }
-
-
-  public function addDataGridCode() {
-    $json_paras = (array) json_decode(file_get_contents('php://input'), true);
-    $json_paras['datagrid_type'] = 'table';
-
-    $this->db->insert('nanx_activity', $json_paras);
-    $ret = [];
-    $db_error = $this->db->error();
-    if ($db_error['code'] > 0) {
-      $ret['code'] = 500;
-      $ret['message'] = "添加Action错误:" . $db_error['message'];
-    } else {
-      $ret['code'] = 200;
-      $ret['message'] = "添加Action成功";
-    }
-
-
-    $menu = [
-      'menu' => $json_paras['datagrid_code'],
-      'text' => $json_paras['datagrid_title'],
-      'router' => '/table/commonXTable',
-      'type' => '菜单',
-      'is_association_process' => 'n',
-      'datagrid_code' => $json_paras['datagrid_code'],
-      'menu_level' => 1
-
-    ];
-    $this->db->insert('boss_portal_menu_list', $menu);
-    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-  }
-
-
-  public function modifyActionCode() {
-    $json_paras = (array) json_decode(file_get_contents('php://input'), true);
-
-    $this->db->where('datagrid_code', $json_paras['datagrid_code']);
-    $this->db->update('nanx_activity', $json_paras);
-    $db_error = $this->db->error();
-    $ret = [];
-    if ($db_error['code'] > 0) {
-      $ret['code'] = 500;
-      $ret['message'] = "修改Action错误:" . $db_error['message'];
-    } else {
-      $ret['code'] = 200;
-      $ret['message'] = "修改Action成功";
-    }
-    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-  }
-
-
-
-
-
-  public function deleteGridCode() {
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $id = $args['id'];
-    $this->db->where('id', $id);
-    $this->db->delete('nanx_activity');
-    $db_error = $this->db->error();
-    if (0 == $db_error['code']) {
-      $ret = ['code' => 200, 'message' => '删除Action成功', 'data' => null];
-    } else {
-      $ret = ['code' => $db_error['code'], 'message' => '删除Action失败,DBcode:' . $db_error['code'], 'data' => null];
-    }
-    echo json_encode($ret);
-  }
 
   //所有字段的配置,包括 label, 是否隐藏(form,column),是否只读,插件,字典表
   public function getActCols() {
@@ -618,121 +450,6 @@ class DataGrid extends MY_Controller {
 
 
 
-
-  function saveOverrideQueryCfg() {
-    $post = file_get_contents('php://input');
-    $para = (array) json_decode($post);
-
-    $actcode =   $para['DataGridCode'];
-    $query_cfg_field =   $para['query_cfg_field'];
-    $query_cfg_value =   $para['query_cfg_value'];
-    $cfg = ['count' => 1, 'lines' => ['and_or_0' => 'and', 'field_0' => $query_cfg_field, 'operator_0' => '=', 'vset_0' => $query_cfg_value]];
-    $cfg = json_encode($cfg);
-    $this->db->where(['datagrid_code' => $actcode]);
-    $this->db->update('nanx_activity', ['fixed_query_cfg' => $cfg]);
-    $db_error = $this->db->error();
-    if ($db_error['code'] > 0) {
-      $ret['code'] = 500;
-      $ret['message'] = "保存Querycfg失败:" . $db_error['message'];
-    } else {
-      $ret = ['code' => 200, 'message'  => '设置query_cfg成功'];
-    }
-    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-  }
-
-
-  public function  addGridReferCfg() {
-
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $data = [];
-
-
-
-
-    $data['reftype'] = $args['reftype'];
-    $data['maintable'] = $args['maintable'];
-
-
-    if (array_key_exists('datagrid_code', $args)) {
-      $data['datagrid_code'] = $args['datagrid_code'];
-    }
-
-    if (array_key_exists('table_button_code', $args)) {
-      $data['table_button_code'] = $args['table_button_code'];
-    }
-
-
-
-
-    if (array_key_exists('act_name', $args)) {
-      $data['act_name'] = $args['act_name'];
-    }
-
-    if (array_key_exists('onaction', $args)) {
-      $data['onaction'] = $args['onaction'];
-    }
-
-
-    if (array_key_exists('infotitle', $args)) {
-      $data['infotitle'] = $args['infotitle'];
-    }
-
-    if (array_key_exists('refer_actcode', $args)) {
-      $data['refer_actcode'] = $args['refer_actcode'];
-    }
-
-
-    if (array_key_exists('refertable', $args)) {
-      $data['refertable'] = $args['refertable'];
-    }
-
-
-    if (array_key_exists('column_to_filter', $args)) {
-      $data['column_to_filter'] = $args['column_to_filter'];
-    }
-
-    if (array_key_exists('maincolumn', $args)) {
-      $data['maincolumn'] = $args['maincolumn'];
-    }
-
-    if (array_key_exists('serviceurl', $args)) {
-      $data['serviceurl'] = $args['serviceurl'];
-    }
-
-    if (array_key_exists('statictext', $args)) {
-      $data['statictext'] = $args['statictext'];
-    }
-
-
-
-    if (array_key_exists('colsused', $args)) {
-      $data['colsused'] = array_to_string($args['colsused'], null);
-    }
-
-
-    if (array_key_exists('btntext', $args)) {
-      $data['btntext'] = $args['btntext'];
-    }
-
-
-
-    if (array_key_exists('sql', $args)) {
-      $data['sql'] = $args['sql'];
-    }
-
-
-
-    $this->db->insert('boss_act_referenceinfo_cfg', $data);
-    $db_error = $this->db->error();
-    if (0 == $db_error['code']) {
-      $ret = ['code' => 200, 'message' => '保存成功', 'data' => null];
-    } else {
-      $ret = ['code' => $db_error['code'], 'message' => '数据库操作失败,DBcode:' . $db_error['code'], 'data' => null];
-    }
-    echo json_encode($ret);
-  }
-
-
   public function actionBasedRowPuller() {
     $args = (array) json_decode(file_get_contents('php://input'));
     $srow = (array) $args['srow'];
@@ -774,25 +491,6 @@ class DataGrid extends MY_Controller {
     die;
   }
 
-
-  public function saveTips() {
-
-    $ret = [];
-    $post = file_get_contents('php://input');
-    $para = (array) json_decode($post);
-    $actcode = $para['DataGridCode'];
-    $tips = $para['tips'];
-    $this->db->where(['datagrid_code' => $actcode]);
-    $this->db->update('nanx_activity', ['tips' => $tips]);
-    $db_error = $this->db->error();
-    if ($db_error['code'] > 0) {
-      $ret['code'] = 500;
-      $ret['message'] = "保存Tips失败:" . $db_error['message'];
-    } else {
-      $ret = ['code' => 200, 'message'  => '保存Tips成功'];
-    }
-    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-  }
 
 
   public function getPortalDataGrids() {

@@ -134,6 +134,7 @@ $autoload['language'] = array();
  */
 
 $autoload['model'] = [
-    'MUser', 'MPermission', 'MExcel', 'MDataGrid', 'MCurd', 'MRdbms', 'MMenu',
-    'MDataGridCfgAssemble', 'MDataGridCfgExecutor', 'MFieldcfg'
+    'MUser', 'MPermission', 'MExcel', 'MDataGrid',   'MRdbms', 'MMenu',
+    'MDataGridCfgAssemble', 'MDataGridCfgExecutor', 'MFieldcfg',
+    'MGridDataPipeRunner', 'MGridDataPipe'
 ];

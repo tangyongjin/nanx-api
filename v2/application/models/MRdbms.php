@@ -1,11 +1,8 @@
 <?php
 
-class MRdbms extends CI_Model
+class MRdbms extends CI_Model {
 
-{
-
-    function getTableColInfo($table)
-    {
+    function getTableColInfo($table) {
         $sql = " show full fields from $table ";
         $cols_all = $this->db->query($sql)->result_array();
         $col_info = array();
@@ -24,8 +21,7 @@ class MRdbms extends CI_Model
 
 
 
-    function translateType($t)
-    {
+    function translateType($t) {
         switch (strtoupper($t)) {
             case 'STRING':
             case 'CHAR':
@@ -66,16 +62,14 @@ class MRdbms extends CI_Model
 
 
 
-    function getTableColumnNames($table)
-    {
+    function getTableColumnNames($table) {
         $fields = $this->db->query("show columns from $table")->result_array();
         return $fields;
     }
 
 
 
-    function getColumnDetail($data)
-    {
+    function getColumnDetail($data) {
 
 
         $fld = array();
@@ -134,12 +128,11 @@ class MRdbms extends CI_Model
 
 
 
-    public function getColNullInfo($base_table)
-    {
+    public function getColNullInfo($base_table) {
         $col_info = $this->getTableColInfo($base_table);
 
         $col_null_set = array();
-        foreach ($col_info as $index => $one_col_info) {
+        foreach ($col_info as   $one_col_info) {
             $col_null_set[$one_col_info['field_name']] = $one_col_info['not_null'];
         }
 
@@ -147,11 +140,10 @@ class MRdbms extends CI_Model
     }
 
 
-    public function fixNull($base_table, $rawData)
-    {
+    public function fixNull($base_table, $rawData) {
         $null_cfg = $this->getColNullInfo($base_table);
         $columns = array_keys($rawData);
-        foreach ($columns as $i => $one_column) {
+        foreach ($columns as $one_column) {
             //如果数据库里面定义为非空,并且前台传来的数据长度为0,则设置为null,让数据库报错.
             if ($null_cfg[$one_column] && 0 == strlen($rawData[$one_column])) {
                 $rawData[$one_column] = null;
