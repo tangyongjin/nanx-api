@@ -115,6 +115,8 @@ class Curd extends MY_Controller {
 
         $rawData_after_null_fix = $this->MRdbms->fixNull($base_table, $rawData);
 
+
+
         $this->db->where('id', $id);
         $sql_mode = " SET SQL_MODE='STRICT_ALL_TABLES' ";
         $this->db->query($sql_mode);
@@ -159,6 +161,14 @@ class Curd extends MY_Controller {
                 $fixed[$key] = $arr[$key];  // 不包含的
             }
         }
+
+        // 如果某些字段没有出现在form中, ghost_字段存了实际的 数字 id 
+
+        foreach ($ghosts as  $dropdownField => $realValue) {
+            $realField = str_replace('ghost_', '', $dropdownField);
+            $fixed[$realField] = $realValue;
+        }
+
         return $fixed;
     }
 
