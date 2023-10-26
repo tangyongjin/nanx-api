@@ -45,6 +45,28 @@ class Curd extends MY_Controller {
     }
 
 
+    public function exportExcel() {
+
+        $para = (array) json_decode(file_get_contents("php://input"));
+        $para['pageSize'] = 1000;
+        $actcfg = $this->MDataGridCfgAssemble->PipeRunner($para);
+        $cols = $actcfg['tableColumnConfig'];
+        $get_data_config = [
+            'DataGridCode' => $para['DataGridCode'],
+            'currentPage' => $para['currentPage'],
+            'isFilterSelfData' => $para['isFilterSelfData'],
+            'pageSize' => 10000000,
+            'query_cfg' => $para['query_cfg'],
+            'role' => $para['role'],
+            'user' => $para['user']
+        ];
+        $result2  =  $this->MGridDataPipeRunner->GridDataHandler($get_data_config);
+        $records = $result2['realrows'];
+        $this->MExcel->exportExcel($actcfg['DataGridMeta']['datagrid_title'], $cols, $records);
+    }
+
+
+
 
 
     public function addData() {
@@ -163,11 +185,10 @@ class Curd extends MY_Controller {
         }
 
         // 如果某些字段没有出现在form中, ghost_字段存了实际的 数字 id 
-
-        foreach ($ghosts as  $dropdownField => $realValue) {
-            $realField = str_replace('ghost_', '', $dropdownField);
-            $fixed[$realField] = $realValue;
-        }
+        // foreach ($ghosts as  $dropdownField => $realValue) {
+        //     $realField = str_replace('ghost_', '', $dropdownField);
+        //     $fixed[$realField] = $realValue;
+        // }
 
         return $fixed;
     }

@@ -32,7 +32,7 @@ class DataGrid extends MY_Controller {
     $this->db->query($sql);
 
     $data = [];
-    foreach ($filedids as $key => $value) {
+    foreach ($filedids as  $value) {
       $insertData = array(
         'datagrid_code' => $datagrid_code,
         'column_field' => $value,
@@ -52,39 +52,11 @@ class DataGrid extends MY_Controller {
     echo json_encode($ret, JSON_UNESCAPED_UNICODE);
   }
 
-  public function exportExcel() {
-
-    $para = (array) json_decode(file_get_contents("php://input"));
-    $para['pageSize'] = 1000;
-    $actcfg = $this->MDataGridCfgAssemble->PipeRunner($para);
-
-    $cols = [];
-    foreach ($actcfg['total_cols_cfg'] as $one_col) {
-      $tmp = [];
-      $tmp['key'] = $one_col['field_e'];
-      $tmp['title'] = $one_col['display_cfg']['field_c'];
-      $cols[] = $tmp;
-    }
-    if ($actcfg['DataGridMeta']['geturl'] == 'curd/listData') {
-      $this->load->model('MCurd');
-      $para = [];
-      $para['DataGridCode'] = $actcfg['DataGridCode'];
-      $para['currentPage'] = 1;
-      $para['pageSize'] = 10000000;
-      $para['role'] = $this->getUser();
-      $para['user'] = $this->getUser();
-      $para['table'] = $actcfg['DataGridMeta']['base_table'];
-
-      // $result = $this->MCurd->getDataGridData($this->getUser(), $para);
-      // $records = $result['rows'];
-      $records = array();
-    }
-    $this->MExcel->exportExcel($actcfg['DataGridMeta']['datagrid_title'], $cols, $records);
-  }
 
 
   //所有字段的配置,包括 label, 是否隐藏(form,column),是否只读,插件,字典表
   public function getActCols() {
+
 
     $ret = [];
     $post = file_get_contents('php://input');
@@ -402,10 +374,6 @@ class DataGrid extends MY_Controller {
       $this->db->insert('nanx_activity_forbidden_field', $wherecfg);
     }
 
-
-
-
-
     //table 是否隐藏  
     $wherecfg = ['datagrid_code' => $actcode,   'field' => $para['Field'], 'forbidden_type' => 'column_hidden'];
 
@@ -474,8 +442,7 @@ class DataGrid extends MY_Controller {
     $base_table = $this->MDataGrid->getBaseTableByActcode($datagrid_code);
     $submitData = $para['submitData'];
 
-    foreach ($submitData as $key => $one_filed_cfg) {
-      # code...
+    foreach ($submitData as   $one_filed_cfg) {
       $this->saveFieldCfgHandler($datagrid_code, $base_table, (array) $one_filed_cfg);
     }
 
