@@ -104,7 +104,7 @@ class Rdbms extends MY_Controller {
 
     public function getAllPlugins() {
 
-        $sql = "select  id,  plugname,plugid,memo from   boss_ufrom_plugin_cfg";
+        $sql = "select  id,  plugname,plugid,memo from   nanx_ufrom_plugin_cfg";
         $ret = ['code' => 200, 'data' => $this->db->query($sql)->result_array()];
         echo json_encode($ret);
     }

@@ -67,7 +67,7 @@ class Permission extends MY_Controller {
   public function getRolesByMenuId() {
     $args = (array) json_decode(file_get_contents("php://input"));
     $menuId = $args['menu_id'];
-    $sql = "SELECT nr.id,nr.role_code,nr.role_name from boss_portal_role_menu_permissions bp 
+    $sql = "SELECT nr.id,nr.role_code,nr.role_name from nanx_portal_role_menu_permissions bp 
                 LEFT JOIN nanx_user_role nr on bp.role=nr.role_code  
                 where bp.menu_id='$menuId'  ";
     $res = $this->db->query($sql)->result_array();
@@ -127,12 +127,12 @@ class Permission extends MY_Controller {
     $menu_id = $args['menu_id_list'];
 
     if ('insert' == $state) {
-      $ret = $this->MPermission->addRoleMenu($role, $menu_id, 'boss_portal_role_menu_permissions');
+      $ret = $this->MPermission->addRoleMenu($role, $menu_id, 'nanx_portal_role_menu_permissions');
       echo json_encode($ret);
       return;
     }
     if ('delete' == $state) {
-      $ret = $this->MPermission->deleteMenuOrButton($menu_id, $role, 'boss_portal_role_menu_permissions', 'menu_id');
+      $ret = $this->MPermission->deleteMenuOrButton($menu_id, $role, 'nanx_portal_role_menu_permissions', 'menu_id');
       echo json_encode($ret);
       return;
     }
@@ -143,7 +143,7 @@ class Permission extends MY_Controller {
     $menuId = $args['menu_id'];
 
     $sql = "SELECT nu.id,nr.role_code, nr.role_name, nu.staff_name, nu.head_portrait,nao.dept_name
-                FROM boss_portal_role_menu_permissions bp 
+                FROM nanx_portal_role_menu_permissions bp 
                 LEFT JOIN nanx_user_role nr ON bp.role = nr.role_code 
                 LEFT JOIN nanx_user_role_assign na ON na.role_code = nr.role_code 
                 LEFT JOIN nanx_user nu ON nu.id = na.userid 

@@ -18,7 +18,7 @@ class Button extends MY_Controller {
     }
 
     public function getAllButtons() {
-        $sql = "select  * from boss_portal_button  ";
+        $sql = "select  * from nanx_portal_button  ";
         $btns = $this->db->query($sql)->result_array();
         $ret = array('code' => 200, 'msg' => 'success', 'data' => $btns,);
         echo json_encode($ret, JSON_UNESCAPED_UNICODE);

@@ -48,7 +48,7 @@ class MPermission extends CI_Model {
       'role' => $role,
       'menu_id' =>  $menu_id
     );
-    $this->db->insert('boss_portal_role_menu_permissions', $data);
+    $this->db->insert('nanx_portal_role_menu_permissions', $data);
     $ret = array('code' => 200, 'msg' => 'success');
     return $ret;
   }

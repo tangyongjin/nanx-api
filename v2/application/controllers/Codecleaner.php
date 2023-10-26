@@ -140,11 +140,11 @@ class Codecleaner extends CI_Controller {
             'boss_flow_add_cfg',
             'nanx_code_table',
             'boss_flow_timeline',
-            'boss_portal_button',
+            'nanx_portal_button',
             'boss_portal_button_special',
             'boss_process_node_handler',
             'boss_res_item_ui',
-            'boss_portal_menu_list',
+            'nanx_portal_menu_list',
         ];
 
         $usage = [];

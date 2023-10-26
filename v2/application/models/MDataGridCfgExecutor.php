@@ -126,15 +126,18 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
     public function transUniFormformCfg($cols) {
         $ret = [];
-        $ret['data'] = [];
-        $ret['data']['type'] = 'object';
-        $ret['data']['properties'] = [];
+        // $ret['data'] = [];
+        // $ret['data']['type'] = 'object';
+        // $ret['data']['properties'] = [];
         $group_all = [];
         $group_all['type'] = 'object';
         $group_all['x-component'] = 'card';
         $group_all['properties'] = $this->toSchemaJson($cols);
-        $ret['data']['properties']['group_all'] =    $group_all;
-        return $ret['data'];
+        // $ret['data']['properties']['group_all'] =    $group_all;
+        $ret['group_all'] =    $group_all;
+        return $ret;
+        // return $ret['data'];
+
     }
 
     public function toSchemaJson($all_cols) {
