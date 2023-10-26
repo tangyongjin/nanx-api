@@ -8,7 +8,7 @@ $query_builder = true;
 
 $db['default'] = [
   'dsn' => '',
-  'hostname' => '192.168.5.98',
+  'hostname' => '172.16.18.102',
   'username' => 'root',
   'password' => '123456',
   'database' => 'nanx',

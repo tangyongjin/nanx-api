@@ -125,19 +125,12 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
 
     public function transUniFormformCfg($cols) {
-        $ret = [];
-        // $ret['data'] = [];
-        // $ret['data']['type'] = 'object';
-        // $ret['data']['properties'] = [];
+
         $group_all = [];
         $group_all['type'] = 'object';
         $group_all['x-component'] = 'card';
         $group_all['properties'] = $this->toSchemaJson($cols);
-        // $ret['data']['properties']['group_all'] =    $group_all;
-        $ret =    $group_all;
-        return $ret;
-        // return $ret['data'];
-
+        return  $group_all;
     }
 
     public function toSchemaJson($all_cols) {
@@ -241,7 +234,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         $all_titles_unique = array_unique($all_titles);
         $i = 0;
         foreach ($all_titles_unique as  $title) {
-            $un_key = 'UFORM_NO_NAME_FIELD' . $i;
+            $un_key = 'dropdown_group_' . $i;
             $small_group = [];
             foreach ($all_cols  as  $key => $one_big) {
                 if ($one_big['grouptitle']  ==   $title) {
