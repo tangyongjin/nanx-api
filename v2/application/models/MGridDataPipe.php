@@ -248,14 +248,9 @@ class MGridDataPipe extends CI_Model implements StageInterface {
         if ($currentUser == 'admin' ||  $currentUser == 'super') {
             return $sql;
         }
-
-        $this->load->model('MRdbms');
-        $all_fields =  array_column($this->MRdbms->getTableColumnNames($table), 'Field');
-        if (!in_array('author', $all_fields)) {
+        if (!$this->payload['is_author_only']) {
             return $sql;
         }
-
-
 
         $this->load->model('MOrganization');
         $scopes = $this->MOrganization->getUserScope($currentUser);
@@ -269,8 +264,7 @@ class MGridDataPipe extends CI_Model implements StageInterface {
         } else {
             $scopes_str =  " and   $table" . ".author in  ( $scopes_str )  ";
         }
-        $newstr = substr_replace($sql, " $scopes_str ", $pointer, 0);
-        return $newstr;
+        return substr_replace($sql, " $scopes_str ", $pointer, 0);
     }
 
 
@@ -300,7 +294,6 @@ class MGridDataPipe extends CI_Model implements StageInterface {
     public function setRealRows() {
 
         $start = ($this->payload['currentPage'] - 1) * $this->payload['pageSize'];
-
         if ($this->payload['pageSize']  != "" || $this->payload['pageSize'] != null) {
             $sql   = $this->payload['sql_with_author'] . " limit {$start}, {$this->payload['pageSize']} ";
         }

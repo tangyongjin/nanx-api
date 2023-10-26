@@ -105,7 +105,10 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
 
     public function setUFormConfig() {
+
         $this->payload['formcfg'] = $this->transUniFormformCfg($this->payload['fmsCfg']);
+        // $this->payload['formcfg'] = $this->toSchemaJson($this->payload['fmsCfg']);
+
     }
 
 
