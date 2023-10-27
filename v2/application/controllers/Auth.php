@@ -22,20 +22,6 @@ class Auth extends MY_Controller {
 
 
 
-  public function getUserRolesById() {
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $id = $args['id'];
-    $sql = "SELECT nura.role_code FROM nanx_user_role_assign nura JOIN nanx_user_role nur 
-        ON nura.role_code = nur.role_code WHERE nura.userid = '$id'";
-    $res = $this->db->query($sql)->result_array();
-    $ret = array(
-      'code' => 200,
-      'message' => "success",
-      'data' => $res,
-    );
-    echo json_encode($ret);
-  }
-
 
   public function changepwd() {
 

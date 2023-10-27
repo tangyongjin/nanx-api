@@ -44,7 +44,7 @@ class Button extends MY_Controller {
         $already_btns = $this->db->query("select * from nanx_grid_button where datagrid_code='{$DataGridCode}' ")->result_array();
         $counter = count($already_btns);
         $btnorder = intval($counter) + 1;
-        $this->db->insert('boss_portal_button_actcode', ['button_code' => $btncode, 'datagrid_code' => $DataGridCode, 'btnorder' => $btnorder]);
+        $this->db->insert('nanx_portal_button_actcode', ['button_code' => $btncode, 'datagrid_code' => $DataGridCode, 'btnorder' => $btnorder]);
 
         $db_error = $this->db->error();
 
@@ -63,7 +63,7 @@ class Button extends MY_Controller {
         $datagrid_code = $json_paras['datagrid_code'];
 
         $this->db->where(['button_code' => $button_code, 'datagrid_code' => $datagrid_code]);
-        $this->db->delete('boss_portal_button_actcode');
+        $this->db->delete('nanx_portal_button_actcode');
         $db_error = $this->db->error();
         if (0 == $db_error['code']) {
             $ret = ['code' => 200, 'message' => '删除按钮成功'];

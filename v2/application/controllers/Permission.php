@@ -76,35 +76,6 @@ class Permission extends MY_Controller {
   }
 
 
-  public function getUserByRole() {
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $role = $args['role_code'];
-
-    $sql = "SELECT nu.staff_name, nu.mobile, nano.dept_name department FROM nanx_user nu 
-                left JOIN nanx_user_role_assign ns ON nu.id = ns.userid 
-                left JOIN nanx_organization nano ON nu.deptid = nano.id 
-                WHERE ns.role_code IN ('$role')";
-    $row = $this->db->query($sql)->result_array();
-    $ret = array('code' => 200, 'msg' => 'success', 'data' => $row);
-    echo json_encode($ret);
-  }
-
-  public function addRole() {
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $data = array(
-      'role_code' => $args['role_code'],
-      'role_name' => $args['role_name'],
-    );
-    $this->db->insert('nanx_user_role', $data);
-    $this->db->insert_id();
-    $ret = array('code' => 200, 'msg' => 'success');
-    echo json_encode($ret);
-  }
-
-
-
-
-
   public function getRoleList() {
     $args = (array) json_decode(file_get_contents('php://input'));
     $page = $args['currentPage'];
