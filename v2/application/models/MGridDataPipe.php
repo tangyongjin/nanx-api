@@ -60,16 +60,26 @@ class MGridDataPipe extends CI_Model implements StageInterface {
 
 
     public function setQueryCfg() {
-        $_query_cfg = (array) $this->payload['_query_cfg'];
 
 
-        if (empty($_query_cfg)) {
+
+
+
+
+
+
+
+
+        if (empty($this->payload['_query_cfg'])) {
             $this->payload['query_cfg'] = null;
         } else {
-            $this->payload['query_cfg']['count'] =  $_query_cfg['count'];
-            $tmp_lines = (array) $_query_cfg['lines'];
+            $objectArray = $this->payload['_query_cfg'];
+            // 将对象数组转换为 JSON 字符串
+            $jsonString = json_encode($objectArray);
+            // 再将 JSON 字符串解码为关联数组
+            $tmp_lines = json_decode($jsonString, true);
             // 第一行的  and_or_0 设置为空格,作为修正
-            $tmp_lines['and_or_0'] = '';
+            $tmp_lines['0']['and_or'] = '';
             $this->payload['query_cfg']['lines'] =  $tmp_lines;
         }
     }
@@ -162,30 +172,27 @@ class MGridDataPipe extends CI_Model implements StageInterface {
             return;
         }
 
-        $count = $this->payload['query_cfg']['count'];
+        $count = count($this->payload['query_cfg']['lines']);
         $lines   = $this->payload['query_cfg']['lines'];
-
-
-
         $where = '';
         for ($i = 0; $i < $count; $i++) {
-
-            $and_or = $lines['and_or_' . $i];
-            $operator = $lines['operator_' . $i];
+            $and_or = $lines[$i]['and_or'];
+            $operator = $lines[$i]['operator'];
             $wrapp_text = "'";  // 全部包装起来, 即使是数字类型的.
-
-            $field_in_line = $lines['field_' . $i];
-            $arg      = $lines['vset_' . $i];
+            $field_in_line = $lines[$i]['field'];
+            $arg      = $lines[$i]['vset'];
             $pair = $this->getQueryPair($field_in_line, $arg);
-
             $where .= $and_or . ' (' . $pair['field'] . ' ' . $operator . ' ' . $wrapp_text .  $pair['argSTr'] . $wrapp_text . ') ';
         }
-
         $this->payload['where_string'] = $where;
     }
 
 
     public function getQueryPair($field_in_line, $arg) {
+
+
+
+
 
         $index = array_search($field_in_line, array_column($this->payload['combo_fields'], 'field_e'));
         // 无任何下拉选项
@@ -212,10 +219,11 @@ class MGridDataPipe extends CI_Model implements StageInterface {
         }
 
         // 两表链接
-        return [
+        $pair = [
             'field' => $this->seekTransformered($triggercfg['combo_table'], $triggercfg['list_field']),
             'argSTr' =>  '%' . $arg . '%',
         ];
+        return $pair;
     }
 
 

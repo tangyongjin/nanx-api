@@ -25,12 +25,24 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
     }
 
 
+    // 确保返回数组
+    private function get_fixed_query_array($tmp) {
+        if ($tmp['fixed_query_cfg'] == '') {
+            return [];
+        }
+        if (is_null($tmp['fixed_query_cfg'])) {
+            return [];
+        }
+        return   json_decode($tmp['fixed_query_cfg']);
+    }
+
     public function setGridMeta() {
         $this->db->where('datagrid_code', $this->payload['DataGridCode']);
         $tmp = $this->db->get('nanx_activity')->row_array();
+        $tmp['fixed_query_cfg']  = $this->get_fixed_query_array($tmp);
         $this->payload['DataGridMeta'] = $tmp;
         $this->payload['base_table'] = $tmp['base_table'];
-        $this->payload['fixed_query_cfg'] = $tmp['fixed_query_cfg'];
+        $this->payload['fixed_query_cfg'] =  $tmp['fixed_query_cfg'];
         $this->payload['form_title'] = $tmp['datagrid_title'];
         $this->payload['tips'] = $tmp['tips'];
         $this->payload['referino'] = [];

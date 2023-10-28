@@ -430,18 +430,26 @@ class DataGrid extends MY_Controller {
     echo json_encode($ret, JSON_UNESCAPED_UNICODE);
   }
 
+
+  public function saveFixedQueryConfigure() {
+    $post = file_get_contents('php://input');
+    $para = (array) json_decode($post);
+    $objectArray = $para['fixedQueryLiens'];
+    // 将对象数组转换为 JSON 字符串
+    $jsonString = json_encode($objectArray);
+    $this->db->where("datagrid_code", $para['datagrid_code']);
+    $this->db->update("nanx_activity", ['fixed_query_cfg' => $jsonString]);
+    $ret = ['code' => 200, 'msg' => '修改成功'];
+    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
+  }
+
   public function batchUpdateFieldCfg() {
-
-
-
     $ret = [];
     $post = file_get_contents('php://input');
     $para = (array) json_decode($post);
     $datagrid_code = $para['datagrid_code'];
-
     $base_table = $this->MDataGrid->getBaseTableByActcode($datagrid_code);
     $submitData = $para['submitData'];
-
     foreach ($submitData as   $one_filed_cfg) {
       $this->saveFieldCfgHandler($datagrid_code, $base_table, (array) $one_filed_cfg);
     }
