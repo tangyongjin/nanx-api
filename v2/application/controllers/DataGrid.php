@@ -278,17 +278,13 @@ class DataGrid extends MY_Controller {
 
     //得到流程对应表
     $base_table = $this->MDataGrid->getBaseTableByActcode($actcode);
-
-
     if (!array_key_exists('uform_para', $para)) {
       $para['uform_para'] = '';
     }
 
-
     if (!array_key_exists('grouptitle', $para)) {
       $para['grouptitle'] = '';
     }
-
 
     // 修改  label
     if (strlen($para['label']) > 1) {
@@ -315,8 +311,6 @@ class DataGrid extends MY_Controller {
         $this->db->insert('nanx_activity_field_special_display_cfg',  $wherecfg);
       }
     }
-
-
 
     if (strlen($para['width']) > 1) {
       $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
@@ -436,7 +430,7 @@ class DataGrid extends MY_Controller {
     $para = (array) json_decode($post);
     $objectArray = $para['fixedQueryLiens'];
     // 将对象数组转换为 JSON 字符串
-    $jsonString = json_encode($objectArray);
+    $jsonString = json_encode($objectArray, JSON_UNESCAPED_UNICODE);
     $this->db->where("datagrid_code", $para['datagrid_code']);
     $this->db->update("nanx_activity", ['fixed_query_cfg' => $jsonString]);
     $ret = ['code' => 200, 'msg' => '修改成功'];

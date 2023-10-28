@@ -60,16 +60,6 @@ class MGridDataPipe extends CI_Model implements StageInterface {
 
 
     public function setQueryCfg() {
-
-
-
-
-
-
-
-
-
-
         if (empty($this->payload['_query_cfg'])) {
             $this->payload['query_cfg'] = null;
         } else {
