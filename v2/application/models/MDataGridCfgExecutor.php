@@ -242,7 +242,12 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
     public function combineByGroup($all_cols) {
         $grouped_ret = new stdClass();
+
+        // debug($all_cols);
+
         $all_titles = array_column((array) $all_cols, 'grouptitle');
+
+
         $all_titles_unique = array_unique($all_titles);
         $i = 0;
         foreach ($all_titles_unique as  $title) {

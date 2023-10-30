@@ -326,7 +326,6 @@ class Curd extends MY_Controller {
 
 
     public function getTableData() {
-
         $post = file_get_contents('php://input');
         $para = (array) json_decode($post);
         $basetable = $para['basetable'];

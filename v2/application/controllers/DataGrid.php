@@ -276,16 +276,9 @@ class DataGrid extends MY_Controller {
 
   public function saveFieldCfgHandler($actcode, $base_table, $para) {
 
-    //得到流程对应表
-    $base_table = $this->MDataGrid->getBaseTableByActcode($actcode);
     if (!array_key_exists('uform_para', $para)) {
       $para['uform_para'] = '';
     }
-
-    if (!array_key_exists('grouptitle', $para)) {
-      $para['grouptitle'] = '';
-    }
-
     // 修改  label
     if (strlen($para['label']) > 1) {
       $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
@@ -294,20 +287,6 @@ class DataGrid extends MY_Controller {
         $this->db->update('nanx_activity_field_special_display_cfg', ['field_c' => $para['label']], $wherecfg);
       } else {
         $wherecfg['field_c'] = $para['label'];
-        // $wherecfg['grouptitle'] = $para['grouptitle'];
-        $this->db->insert('nanx_activity_field_special_display_cfg',  $wherecfg);
-      }
-    }
-
-
-    // 修改  grouptitle
-    if (strlen($para['grouptitle']) > 1) {
-      $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
-      $rows = $this->db->get_where('nanx_activity_field_special_display_cfg', $wherecfg)->result_array();
-      if (count($rows) == 1) {
-        $this->db->update('nanx_activity_field_special_display_cfg', ['grouptitle' => $para['grouptitle']], $wherecfg);
-      } else {
-        $wherecfg['grouptitle'] = $para['grouptitle'];
         $this->db->insert('nanx_activity_field_special_display_cfg',  $wherecfg);
       }
     }
@@ -316,17 +295,18 @@ class DataGrid extends MY_Controller {
       $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
       $rows = $this->db->get_where('nanx_activity_field_special_display_cfg', $wherecfg)->result_array();
       if (count($rows) == 1) {
-        $this->db->update('nanx_activity_field_special_display_cfg', ['width' => $para['width'],], $wherecfg);
+        $this->db->update('nanx_activity_field_special_display_cfg', ['width' => $para['width']], $wherecfg);
       } else {
         $wherecfg['width'] = $para['width'];
         $this->db->insert('nanx_activity_field_special_display_cfg',  $wherecfg);
       }
     }
+
     if (strlen($para['handler']) > 1) {
       $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
       $rows = $this->db->get_where('nanx_activity_field_special_display_cfg', $wherecfg)->result_array();
       if (count($rows) == 1) {
-        $this->db->update('nanx_activity_field_special_display_cfg', ['handler' => $para['handler'],], $wherecfg);
+        $this->db->update('nanx_activity_field_special_display_cfg', ['handler' => $para['handler']], $wherecfg);
       } else {
         $wherecfg['handler'] = $para['handler'];
         $this->db->insert('nanx_activity_field_special_display_cfg',  $wherecfg);
@@ -375,7 +355,6 @@ class DataGrid extends MY_Controller {
     $this->db->where($wherecfg);
     $this->db->delete('nanx_activity_forbidden_field');
     if (intval($para['column_hidden']) == 1) {
-
       $this->db->insert('nanx_activity_forbidden_field', $wherecfg);
     }
 
