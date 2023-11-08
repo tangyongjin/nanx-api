@@ -129,13 +129,8 @@ class MY_Controller extends CI_Controller {
       'Auth/JWT_login',
       'tree/systemSummary',
       'tree/index',
-      'bpm/getUserLeader',
-      'test/*',
-      'file/*',
       'App/*',
-      'app/*',
       'Network/*',
-      'network/*',
       'dbdocu/gethelp',
     );
 
@@ -167,6 +162,7 @@ class MY_Controller extends CI_Controller {
     }
 
     $token_array = (array) $token_decoded;
+
 
     if ($token_array['exp'] < time()) {
       //超时了,强制退出

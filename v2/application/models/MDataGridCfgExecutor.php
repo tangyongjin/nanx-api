@@ -21,6 +21,8 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
 
     public function getter() {
+        unset($this->payload['total_cols_cfg']);
+        unset($this->payload['fmsCfg']);
         return  $this->payload;
     }
 
@@ -109,6 +111,11 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
                 $tmp = [];
                 $tmp['key'] = $col['field_e'];
                 $tmp['title'] = $col['display_cfg']['field_c'];
+                if (array_key_exists('handler', $col['display_cfg'])) {
+                    $tmp['handler'] = $col['display_cfg']['handler'];
+                } else {
+                    $tmp['handler'] = null;
+                }
                 $cols[] = $tmp;
             }
         }
@@ -117,10 +124,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
 
     public function setUFormConfig() {
-
         $this->payload['formcfg'] = $this->transUniFormformCfg($this->payload['fmsCfg']);
-        // $this->payload['formcfg'] = $this->toSchemaJson($this->payload['fmsCfg']);
-
     }
 
 
@@ -148,16 +152,13 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
     public function toSchemaJson($all_cols) {
         $ret = new stdClass();
         foreach ($all_cols as $col) {
-            //skip 流程主表的公共字段
-            if (in_array($col['field_e'],  [])) {
-                continue;
-            }
+
             $tmp = [];
-            $tmp['grouptitle'] = '';
             $tmp['type'] = $col['editor_cfg']['uform_plugin'];
             $tmp['title'] = $col['display_cfg']['field_c'];
             $tmp['required'] = $col['editor_cfg']['null_option']  == 'NO' ? true : false;    //是否必填项
             $tmp['x-visible'] = true;   // 是否可见 
+
             $common_plugins = ['string', 'date', 'number'];
             if (!(in_array($col['editor_cfg']['uform_plugin'], $common_plugins))) {
                 $col['editor_cfg']['trigger_cfg'] = null;
@@ -192,11 +193,8 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
                     $tmp['x-props']['editable'] = true;
                 }
             }
-
-
             $ret->{$col['field_e']} = $tmp;
         }
-        $ret = $this->combineByGroup($ret);
         return $ret;
     }
 
@@ -220,7 +218,6 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
             'codetable_category_value' => $col['editor_cfg']['trigger_cfg']['codetable_category_value'],
             'label_field'                                 => $col['editor_cfg']['trigger_cfg']['list_field'],
             'value_field'                                 => $col['editor_cfg']['trigger_cfg']['value_field'],
-
         ];
 
         $xprops = [
@@ -240,29 +237,6 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         return $xprops;
     }
 
-    public function combineByGroup($all_cols) {
-        $grouped_ret = new stdClass();
-
-        // debug($all_cols);
-
-        $all_titles = array_column((array) $all_cols, 'grouptitle');
-
-
-        $all_titles_unique = array_unique($all_titles);
-        $i = 0;
-        foreach ($all_titles_unique as  $title) {
-            $un_key = 'dropdown_group_' . $i;
-            $small_group = [];
-            foreach ($all_cols  as  $key => $one_big) {
-                if ($one_big['grouptitle']  ==   $title) {
-                    $small_group[$key] = $one_big;
-                }
-            }
-            $grouped_ret->$un_key  = ['type' => 'object', 'x-component' => 'card', 'x-props' => ['title' => $title], 'properties' => $small_group];
-            $i++;
-        }
-        return $grouped_ret;
-    }
 
 
     public function find_associate_field($all_cols, $this_level, $this_group_id) {

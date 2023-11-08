@@ -23,7 +23,9 @@ class MMenu extends CI_Model {
     $sql = "select   menu_role.role, 
             menu.menu_level,menu.datagrid_code,
             menu.id 'key',
-            menu.menu,menu.type,menu.text ,menu.text as title,menu.icon,
+            menu.menu,menu.type,menu.text ,menu.text as title,
+            menu.text as label,
+            menu.icon,
             menu.router,
             if(menu.is_leaf='true',true,false ) as  'isLeaf',
             menu.parent_id

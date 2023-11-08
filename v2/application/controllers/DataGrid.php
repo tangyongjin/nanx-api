@@ -55,7 +55,7 @@ class DataGrid extends MY_Controller {
 
 
   //所有字段的配置,包括 label, 是否隐藏(form,column),是否只读,插件,字典表
-  public function getActCols() {
+  public function getColsDbInfo() {
 
 
     $ret = [];
@@ -85,6 +85,7 @@ class DataGrid extends MY_Controller {
 
 
       if ($row) {
+
         $tmp['width'] = $row['width'];
         $tmp['handler'] = $row['handler'];
         $tmp['label'] = $row['field_c'];

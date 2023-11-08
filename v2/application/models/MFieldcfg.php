@@ -69,7 +69,7 @@ class MFieldcfg extends CI_Model {
 
 
         foreach ($all_db_fields as $db_field) {
-            $display_cfg            = $this->getDisplayCfg($base_table, $db_field, $transfer);
+            $display_cfg            = $this->getDisplayCfg($datagrid_code, $db_field, $transfer);
             $editor_cfg             = $this->getEditorCfg($datagrid_code, $base_table, $db_field);
             $tmp_cfg['field_e']     = $db_field['Field'];
             $tmp_cfg['display_cfg'] = $display_cfg;
@@ -83,20 +83,13 @@ class MFieldcfg extends CI_Model {
 
     //transfer = 是否需要转换
     function getDisplayCfg($datagrid_code,   $db_field, $transfer) {
+
         if (!$transfer) {
-            return array(
-                'field_c' => $db_field['Field'],
-                'value' => $db_field['Field'],
-                'width' => 200,
-                'show_as_pic' => 0
-            );
+            return ['field_c' => $db_field['Field'], 'value' => $db_field['Field'], 'width' => 200, 'show_as_pic' => 0];
         }
 
-        // 先根据 datagrid_code +  field_e 查询
-
         $this->db->where(['datagrid_code' => $datagrid_code, 'field_e' => $db_field['Field']]);
-        $this->db->select(['field_c', 'field_width', 'label_width', 'show_as_pic']);
-        $row = $this->db->get('nanx_activity_field_special_display_cfg')->first_row('array');
+        $row = $this->db->get('nanx_activity_field_special_display_cfg')->row_array();
         if ($row) {
             if (strlen($row['field_c']) == 0) {
                 $row['field_c'] = $db_field['Field'];

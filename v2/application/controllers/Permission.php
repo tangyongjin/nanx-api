@@ -35,7 +35,6 @@ class Permission extends MY_Controller {
 
     $ret = [
       'code' => 200,
-      'message'  => '获取菜单成功',
       'data' => ['menuList'  => $menuList,]
     ];
     echo json_encode($ret);
