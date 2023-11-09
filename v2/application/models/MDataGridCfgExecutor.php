@@ -158,10 +158,9 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
             $tmp['type'] = $col['editor_cfg']['uform_plugin'];
             $tmp['title'] = $col['display_cfg']['field_c'];
             $tmp['required'] = $col['editor_cfg']['null_option']  == 'NO' ? true : false;    //是否必填项
+            $tmp['editable'] = true;
             if (array_key_exists('readonly', $col['editor_cfg'])) {
                 if (intval($col['editor_cfg']['readonly']) == 1) {
-                    $tmp['editable'] = true;
-                } else {
                     $tmp['editable'] = false;
                 }
             }
