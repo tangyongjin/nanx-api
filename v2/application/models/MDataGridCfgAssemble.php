@@ -27,6 +27,7 @@ class MDataGridCfgAssemble extends CI_Model {
                 $this->MDataGridCfgExecutor->setGridMeta($config);
             })
             ->pipe(function ($config) {
+                // 获取  editor_cfg, display_cfg
                 $this->MDataGridCfgExecutor->setTotalColsCfg();
             })
 
@@ -40,7 +41,7 @@ class MDataGridCfgAssemble extends CI_Model {
                 $this->MDataGridCfgExecutor->setTableColumnConfig();
             })
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->setFormColumnsConfig();
+                $this->MDataGridCfgExecutor->setFormUsedColumns();
             })
             ->pipe(function ($config) {
                 $this->MDataGridCfgExecutor->setUFormConfig();

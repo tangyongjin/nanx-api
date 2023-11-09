@@ -48,8 +48,6 @@ class MFieldcfg extends CI_Model {
             'varchar'
         );
 
-
-
         if ($range == 'all') {
             return $data_types;
         }
@@ -63,55 +61,36 @@ class MFieldcfg extends CI_Model {
 
 
     //all_db_fields 为所有字段, 获取所有的字段的配置,
-    function getAllColsCfg($datagrid_code, $base_table, $all_db_fields, $transfer) {
-        $col_cfg = array();
-        $tmp_cfg = array();
-
-
+    function getAllColsCfg($datagrid_code, $base_table, $all_db_fields) {
+        $col_cfg = [];
         foreach ($all_db_fields as $db_field) {
-            $display_cfg            = $this->getDisplayCfg($datagrid_code, $db_field, $transfer);
-            $editor_cfg             = $this->getEditorCfg($datagrid_code, $base_table, $db_field);
+            $tmp_cfg =  [];
             $tmp_cfg['field_e']     = $db_field['Field'];
-            $tmp_cfg['display_cfg'] = $display_cfg;
-            $tmp_cfg['editor_cfg']  = $editor_cfg;
+            $tmp_cfg['display_cfg'] = $this->getDisplayCfg($datagrid_code, $db_field);
+            $tmp_cfg['editor_cfg']  = $this->getEditorCfg($datagrid_code, $base_table, $db_field);
             $col_cfg[]              = $tmp_cfg;
         }
-
         return $col_cfg;
     }
 
 
-    //transfer = 是否需要转换
-    function getDisplayCfg($datagrid_code,   $db_field, $transfer) {
+    function getDisplayCfg($datagrid_code,  $db_field) {
 
-        if (!$transfer) {
-            return ['field_c' => $db_field['Field'], 'value' => $db_field['Field'], 'width' => 200, 'show_as_pic' => 0];
+        $title =  $db_field['Field'];
+        $field_comment = $db_field['Comment'];
+        if (strlen($field_comment) > 1) {
+            $title = $field_comment;
         }
 
         $this->db->where(['datagrid_code' => $datagrid_code, 'field_e' => $db_field['Field']]);
         $row = $this->db->get('nanx_activity_field_special_display_cfg')->row_array();
         if ($row) {
             if (strlen($row['field_c']) == 0) {
-                $row['field_c'] = $db_field['Field'];
+                $title = $row['field_c'];
             }
-            return $row;
         }
 
-
-        $field_comment = $db_field['Comment'];
-        if (strlen($field_comment) > 1) {
-            $field_c = $field_comment;
-        } else {
-            $field_c = $db_field['Field'];
-        }
-
-
-        $display = array(
-            'field_c' => $field_c,
-            'value' => $db_field['Field'],
-            'width' => 200,
-            'show_as_pic' => "0"
-        );
+        $display = ['field_c' => $title, 'show_as_pic' => "0"];
         return $display;
     }
 
@@ -140,7 +119,6 @@ class MFieldcfg extends CI_Model {
 
         $this->db->where($w1);
         $common = $this->db->get('nanx_biz_column_editor_cfg')->row_array();
-        // first_row('array');
 
 
         if (empty($common)) {
@@ -156,25 +134,9 @@ class MFieldcfg extends CI_Model {
             $common['uform_para'] = $common['uform_para'];
             $common['found'] = true;
         }
-
-
-        $common['rowbasevalue'] = null;
         return $common;
     }
 
-    // function getFollowCfg($base_table, $field)
-    // {
-
-    //     $where = array(
-    //         'base_table' => $base_table,
-    //         'field_e' => $field
-    //     );
-
-    //     $this->db->where($where);
-    //     $this->db->select('base_table,field_e,combo_table,combo_table_value_field,base_table_follow_field,combo_table_follow_field');
-    //     $follow_cfg = $this->db->get('nanx_biz_column_follow_cfg')->result_array();
-    //     return $follow_cfg;
-    // }
 
     function getEditorCfg($datagrid_code, $base_table, $db_field) {
 
@@ -186,11 +148,8 @@ class MFieldcfg extends CI_Model {
             $editor_cfg['uform_plugin'] =  $this->toUnformType($field_mysql_type);
         }
 
-
-        $trigger_cfg               = $this->getTriggerCfg($datagrid_code, $base_table, $db_field['Field']);
-        $editor_cfg['trigger_cfg'] = $trigger_cfg;
+        $editor_cfg['trigger_cfg'] = $this->getTriggerCfg($datagrid_code, $base_table, $db_field['Field']);
         $editor_cfg['uform_para'] = $editor_cfg['uform_para'];
-        // $editor_cfg['follow_cfg']  = $follow_cfg;
         $editor_cfg['null_option'] = $db_field['Null'];
         return $editor_cfg;
     }
@@ -253,40 +212,14 @@ class MFieldcfg extends CI_Model {
                 $ghost   = '';
             }
         }
-
         reset($combo_fileds);
-        return array(
-            'join' => $join,
-            'transed' => $transed,
-            'ghost' => $ghost
-        );
+        return ['join' => $join, 'transed' => $transed, 'ghost' => $ghost];
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     function toUnformType($field_type) {
 
         $data_types = $this->getMysqlDataTypes('all');  //所有的mysql类型.
-
         $mysql_type_found = 'char';  // 即使找不到也缺省为 char
 
         foreach ($data_types as $mysql_type) {
@@ -295,50 +228,31 @@ class MFieldcfg extends CI_Model {
                 continue;
             }
         }
-
         $uform_type = $this->convertToUformType($mysql_type_found);
         return    $uform_type;
     }
 
 
-
-
-
-
     function convertToUformType($field_type) {
-        switch (strtoupper($field_type)) {
-            case 'STRING':
-            case 'CHAR':
-            case 'VARCHAR':
-            case 'TINYBLOB':
-            case 'TINYTEXT':
-            case 'ENUM':
-            case 'SET':
-                return 'string';    //通用的字符串组件
-            case 'TEXT':
-            case 'LONGTEXT':
-            case 'MEDIUMTEXT':
-                return 'text_area';  //uform封装的textarea
 
-            case 'DATE':
-            case 'TIME':
-            case 'DATETIME':
-            case 'TIMESTAMP':
-                return 'date';  //date	年月日输入组件
-            case 'INT':
-            case 'INTEGER':
-            case 'BIGINT':
-            case 'TINYINT':
-            case 'MEDIUMINT':
-            case 'DECIMAL':
-            case 'DOUBLE':
-            case 'SMALLINT':
-            case 'YEAR':
-            case 'FLOAT':
-            case 'REAL':
-                return 'number';  //整型输入组件
-            default:
-                return 'string';
+        $upper_field_type = strtoupper($field_type);
+
+        if (in_array($upper_field_type, ['STRING', 'CHAR', 'VARCHAR', 'TINYBLOB', 'TINYTEXT', 'ENUM', 'SET'])) {
+            return 'string';    // uform string
         }
+
+        if (in_array($upper_field_type, ['TEXT', 'LONGTEXT', 'MEDIUMTEXT'])) {
+            return 'textarea'; // uform textarea
+        }
+
+        if (in_array($upper_field_type, ['DATE', 'TIME', 'DATETIME', 'TIMESTAMP'])) {
+            return 'UDateEditor';    // bugfix ==> UDateEditor
+        }
+
+        if (in_array($upper_field_type, ['INT', 'INTEGER', 'BIGINT', 'TINYINT', 'MEDIUMINT', 'DECIMAL', 'DOUBLE', 'SMALLINT', 'YEAR', 'FLOAT', 'REAL'])) {
+            return 'number';    //通用的字符串组件
+        }
+
+        return 'string';
     }
 }

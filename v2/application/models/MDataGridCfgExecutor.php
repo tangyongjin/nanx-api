@@ -22,7 +22,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
     public function getter() {
         unset($this->payload['total_cols_cfg']);
-        unset($this->payload['fmsCfg']);
+        unset($this->payload['formUsedCols']);
         return  $this->payload;
     }
 
@@ -88,7 +88,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         $datagrid_code =    $this->payload['DataGridCode'];
         $base_table =   $this->payload['base_table'];
         $all_db_fields =    $this->db->query("show full fields  from $base_table")->result_array();
-        $this->payload['total_cols_cfg']  = $this->MFieldcfg->getAllColsCfg($datagrid_code, $base_table, $all_db_fields, true);
+        $this->payload['total_cols_cfg']  = $this->MFieldcfg->getAllColsCfg($datagrid_code, $base_table, $all_db_fields);
     }
 
     public function  setColumnHiddenCols() {
@@ -123,21 +123,22 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
     }
 
 
-    public function setUFormConfig() {
-        $this->payload['formcfg'] = $this->transUniFormformCfg($this->payload['fmsCfg']);
-    }
 
 
-    public function setFormColumnsConfig() {
+    public function setFormUsedColumns() {
         $cols = [];
         foreach ($this->payload['total_cols_cfg']  as $col) {
             if (!in_array($col['field_e'], array_column($this->payload['formHiddenColumns'], 'field'))) {
                 $cols[] = $col;
             }
         }
-        $this->payload['fmsCfg'] = $cols;
+        $this->payload['formUsedCols'] = $cols;
     }
 
+
+    public function setUFormConfig() {
+        $this->payload['formcfg'] = $this->transUniFormformCfg($this->payload['formUsedCols']);
+    }
 
 
     public function transUniFormformCfg($cols) {
@@ -157,50 +158,33 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
             $tmp['type'] = $col['editor_cfg']['uform_plugin'];
             $tmp['title'] = $col['display_cfg']['field_c'];
             $tmp['required'] = $col['editor_cfg']['null_option']  == 'NO' ? true : false;    //是否必填项
-            $tmp['x-visible'] = true;   // 是否可见 
-
-            $common_plugins = ['string', 'date', 'number'];
-            if (!(in_array($col['editor_cfg']['uform_plugin'], $common_plugins))) {
-                $col['editor_cfg']['trigger_cfg'] = null;
-            }
-
-
-            if (!empty($col['editor_cfg']['trigger_cfg'])) {
-                $tmp['enum'] = [];  //控制前台出现 Select 
-                $tmp['type'] = 'Assocselect';   //强制指定下.
-                $tmp['x-component'] =   'Assocselect';
-                $xprops = $this->getTriggerXprops($all_cols, $col);
-                $xprops['uform_para'] = $col['editor_cfg']['uform_para'];
-                $tmp['x-props'] = $xprops;
-            } else {
-                $tmp['x-props'] = [
-                    'field_id' => $col['field_e'], 'trigger_style' => 'no_trigger',
-                    'uform_para' => $col['editor_cfg']['uform_para']
-                ];
-            }
-
-            if ($tmp['type'] == 'TableEditor') {
-                $tmp['x-props'] = ['datagrid_code' => $col['editor_cfg']['uform_para']];
-            }
-
-
-
             if (array_key_exists('readonly', $col['editor_cfg'])) {
-
                 if (intval($col['editor_cfg']['readonly']) == 1) {
-                    $tmp['x-props']['editable'] = false;
+                    $tmp['editable'] = true;
                 } else {
-                    $tmp['x-props']['editable'] = true;
+                    $tmp['editable'] = false;
                 }
             }
+            if (!empty($col['editor_cfg']['trigger_cfg'])) {
+                $tmp['type'] = 'Assocselect';   //强制指定下.
+            }
+            $tmp['x-props'] = $this->getXprops($all_cols, $col);
             $ret->{$col['field_e']} = $tmp;
         }
         return $ret;
     }
 
+
+    public function getXprops($all_cols, $col) {
+        if (empty($col['editor_cfg']['trigger_cfg'])) {
+            $xprops = ['field_id' => $col['field_e'], 'uform_para' => $col['editor_cfg']['uform_para']];
+        } else {
+            $xprops = $this->getTriggerXprops($all_cols, $col);
+        }
+        return  $xprops;
+    }
+
     public function getTriggerXprops($all_cols, $col) {
-
-
 
         $this_level = $col['editor_cfg']['trigger_cfg']['level'];
         $this_group_id = $col['editor_cfg']['trigger_cfg']['group_id'];
@@ -209,6 +193,8 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
         // 方便前台处理,所以重复
         $_tmp = [
+            'field_id' => $col['field_e'],
+            'uform_para' => $col['editor_cfg']['uform_para'],
             'level'                                       => $this_level,
             'api'                                         => 'curd/getTableData',
             'basetable'                                   => $col['editor_cfg']['trigger_cfg']['combo_table'],
@@ -218,22 +204,10 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
             'codetable_category_value' => $col['editor_cfg']['trigger_cfg']['codetable_category_value'],
             'label_field'                                 => $col['editor_cfg']['trigger_cfg']['list_field'],
             'value_field'                                 => $col['editor_cfg']['trigger_cfg']['value_field'],
-        ];
-
-        $xprops = [
-            'level'                                       => $this_level,
-            'api'                                         => 'curd/getTableData',
-            'basetable'                                   => $col['editor_cfg']['trigger_cfg']['combo_table'],
-            'filter_field'                                => $col['editor_cfg']['trigger_cfg']['filter_field'],
-            'associate_field'                             => $associate_field,
-            'trigger_group_uuid'                          => $this_group_id,
-            'codetable_category_value' => $col['editor_cfg']['trigger_cfg']['codetable_category_value'],
-            'label_field'                                 => $col['editor_cfg']['trigger_cfg']['list_field'],
-            'value_field'                                 => $col['editor_cfg']['trigger_cfg']['value_field'],
-            'query_cfg' => $_tmp,
-            'ass_select_field_id' => $col['field_e']
+            'as_select_field_id' => $col['field_e'],
 
         ];
+        $xprops = ['trigger_cfg' => $_tmp];
         return $xprops;
     }
 
