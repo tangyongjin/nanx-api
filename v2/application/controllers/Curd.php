@@ -38,6 +38,7 @@ class Curd extends MY_Controller {
         $ret['code'] = 200;
         $ret['data'] = $result2['realrows'];
         $ret['total'] = (int) $result2['total'];
+        $ret['rows'] = count($result2['realrows']);
         $ret['sql'] = $result2['lastsql'];
         $ret['debug'] = $result2;
 

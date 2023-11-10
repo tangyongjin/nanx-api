@@ -77,6 +77,8 @@ class MFieldcfg extends CI_Model {
     function getDisplayCfg($datagrid_code,  $db_field) {
 
         $title =  $db_field['Field'];
+        $handler = null;
+
         $field_comment = $db_field['Comment'];
         if (strlen($field_comment) > 1) {
             $title = $field_comment;
@@ -85,12 +87,16 @@ class MFieldcfg extends CI_Model {
         $this->db->where(['datagrid_code' => $datagrid_code, 'field_e' => $db_field['Field']]);
         $row = $this->db->get('nanx_activity_field_special_display_cfg')->row_array();
         if ($row) {
-            if (strlen($row['field_c']) == 0) {
+            if (strlen($row['field_c']) > 0) {
                 $title = $row['field_c'];
+            }
+
+            if (strlen($row['handler']) > 0) {
+                $handler = $row['handler'];
             }
         }
 
-        $display = ['field_c' => $title, 'show_as_pic' => "0"];
+        $display = ['field_c' => $title,  'handler' => $handler, 'show_as_pic' => "0"];
         return $display;
     }
 

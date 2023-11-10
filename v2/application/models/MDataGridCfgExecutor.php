@@ -45,7 +45,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         $this->payload['DataGridMeta'] = $tmp;
         $this->payload['base_table'] = $tmp['base_table'];
         $this->payload['fixed_query_cfg'] =  $tmp['fixed_query_cfg'];
-        $this->payload['form_title'] = $tmp['datagrid_title'];
+        $this->payload['datagrid_title'] = $tmp['datagrid_title'];
         $this->payload['tips'] = $tmp['tips'];
         $this->payload['referino'] = [];
         $this->payload['curd']['geturl'] =  $tmp['geturl'];
