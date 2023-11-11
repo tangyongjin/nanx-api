@@ -10,21 +10,33 @@ class Permission extends MY_Controller {
     parent::__construct();
   }
 
-  // 登录用菜单列表
+  public function getTreeMenuList() {
+    $rows = $this->MMenu->getTreeMenuList();
+    $rows = $this->MMenu->stringToBoolean($rows);
+    $ret = array('code' => 200, 'msg' => 'success', 'data' => $rows);
+    echo json_encode($ret);
+  }
+
   public function getMenuTreeByRoleCode() {
     $args = (array) json_decode(file_get_contents('php://input'));
     $role_code = $args['role_code'];
+    // 获取系统所有的菜单
     $rows = $this->MMenu->getTreeMenuList();
     $rows = $this->MMenu->stringToBoolean($rows);
     $menuList = [];
 
-    foreach ($rows as   $one) {
-      if ($one['role'] == $role_code) {
+    // 获取 role 用到的 menuIds
+    $this->db->where('role', $role_code);
+    $this->db->select('menu_id');
+    $menuIds = $this->db->get('nanx_portal_role_menu_permissions')->result_array();
+    $menuIds = array_retrieve($menuIds, 'menu_id');
 
+    foreach ($rows as   $one) {
+      if (in_array($one['key'], $menuIds)) {
         $tmp = $one;
         $realChildren = [];
         foreach ($one['children'] as   $oneChild) {
-          if ($oneChild['role'] == $role_code) {
+          if (in_array($oneChild['key'], $menuIds)) {
             $realChildren[] = $oneChild;
           }
         }
@@ -40,28 +52,8 @@ class Permission extends MY_Controller {
     echo json_encode($ret);
   }
 
-  // 分配菜单用,穿梭组件
-  public function getTreeMenuList() {
-
-    $rows = $this->MMenu->getTreeMenuList();
-    $rows = $this->MMenu->stringToBoolean($rows);
 
 
-
-    $ret = array('code' => 200, 'msg' => 'success', 'data' => $rows);
-    echo json_encode($ret);
-  }
-
-  // 分配菜单用,穿梭组件
-  public function getRoleMenuList() {
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $role = $args['role_code'];
-    $this->load->model('MPermission');
-    $rows = $this->MMenu->getRoleMenuList($role);
-    $rows = $this->MMenu->stringToBoolean($rows);
-    $ret = array('code' => 200, 'msg' => 'success', 'data' => $rows);
-    echo json_encode($ret);
-  }
 
   public function getRolesByMenuId() {
     $args = (array) json_decode(file_get_contents("php://input"));
@@ -92,21 +84,81 @@ class Permission extends MY_Controller {
   public function saveMenuPermission() {
     $args = (array) json_decode(file_get_contents('php://input'));
     $this->load->model('MPermission');
-    $state = $args['state'];
-    $role  = $args['role_code'];
-    $menu_id = $args['menu_id_list'];
 
-    if ('insert' == $state) {
-      $ret = $this->MPermission->addRoleMenu($role, $menu_id, 'nanx_portal_role_menu_permissions');
-      echo json_encode($ret);
-      return;
+    $rolecode = $args['rolecode'];
+    $menu_level = $args['menu_level'];
+    $menuid = $args['menuid'];
+    $parentid = $args['parentid'];
+
+    if ($menu_level  == 1) {
+      $arr = ['role' => $rolecode, 'menu_id' => $menuid];
+      $this->db->where($arr);
+      $this->db->delete('nanx_portal_role_menu_permissions');
+      $this->db->insert('nanx_portal_role_menu_permissions', $arr);
     }
-    if ('delete' == $state) {
-      $ret = $this->MPermission->deleteMenuOrButton($menu_id, $role, 'nanx_portal_role_menu_permissions', 'menu_id');
+
+    if ($menu_level  == 2) {
+      $arr1 = ['role' => $rolecode, 'menu_id' => $parentid];
+      $this->db->where($arr1);
+      $this->db->delete('nanx_portal_role_menu_permissions');
+
+      $arr2 = ['role' => $rolecode, 'menu_id' => $menuid];
+      $this->db->where($arr2);
+      $this->db->delete('nanx_portal_role_menu_permissions');
+
+      $this->db->insert('nanx_portal_role_menu_permissions', $arr1);
+      $this->db->insert('nanx_portal_role_menu_permissions', $arr2);
+    }
+
+    $ret = ['code' => 200, 'msg' => 'success'];
+    echo json_encode($ret);
+  }
+
+
+  public function deleteMenuPermission() {
+    $args = (array) json_decode(file_get_contents('php://input'));
+    $this->load->model('MPermission');
+
+    $rolecode = $args['rolecode'];
+    $menu_level = $args['menu_level'];
+    $menuid = $args['menuid'];
+    $parentid = $args['parentid'];
+
+    if ($menu_level  == 1) {
+      $arr = ['role' => $rolecode, 'menu_id' => $menuid];
+      $this->db->where($arr);
+      $this->db->delete('nanx_portal_role_menu_permissions');
+    }
+
+    if ($menu_level  == 2) {
+
+      $arr2 = ['role' => $rolecode, 'menu_id' => $menuid];
+      $this->db->where($arr2);
+      $this->db->delete('nanx_portal_role_menu_permissions');
+
+      $sql = " select id  from  nanx_portal_menu_list where parent_id= $parentid
+               and id in (select menu_id from  nanx_portal_role_menu_permissions)  
+             ";
+      $existsSecondlevelMenu = $this->db->query($sql)->result_array();
+      if (count($existsSecondlevelMenu)  == 0) {
+        $arr1 = ['role' => $rolecode, 'menu_id' => $parentid];
+        $this->db->where($arr1);
+        $this->db->delete('nanx_portal_role_menu_permissions');
+      }
+
+      $ret = ['code' => 200, 'msg' => 'success', 'sql' => $sql];
       echo json_encode($ret);
-      return;
     }
   }
+
+
+
+
+
+
+
+
+
 
   public function getUsersByMenuId() {
     $args = (array) json_decode(file_get_contents("php://input"));

@@ -180,10 +180,6 @@ class MGridDataPipe extends CI_Model implements StageInterface {
 
     public function getQueryPair($field_in_line, $arg) {
 
-
-
-
-
         $index = array_search($field_in_line, array_column($this->payload['combo_fields'], 'field_e'));
         // 无任何下拉选项
         if ($index === false) {

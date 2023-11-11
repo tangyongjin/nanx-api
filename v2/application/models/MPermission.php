@@ -42,7 +42,7 @@ class MPermission extends CI_Model {
   }
 
   //新增菜单
-  public function addRoleMenu($role, $menu_ids) {
+  public function saveMenuPermission($role, $menu_ids) {
     $menu_id = $menu_ids[0];
     $data = array(
       'role' => $role,

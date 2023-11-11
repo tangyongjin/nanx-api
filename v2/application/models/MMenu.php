@@ -5,51 +5,27 @@ class MMenu extends CI_Model {
   }
 
 
-  /**穿梭菜单用 ,获取已经分配的 菜单key */
-  public function getRoleMenuList($role) {
-    $sql = "select wl.id 'key', if(wl.is_leaf='true',true,false ) as  'isLeaf',wl.parent_id 
-                from nanx_portal_role_menu_permissions wp
-                join nanx_portal_menu_list wl on wp.menu_id=wl.id 
-                where wp.role='$role'";
-    $res = $this->db->query($sql)->result_array();
-    foreach ($res as &$value) {
-      $value['children'] = [];
-    }
-    $res = $this->getParentText($res);
-    return $res;
-  }
 
   public function getTreeMenuList() {
-    $sql = "select   menu_role.role, 
-            menu.menu_level,menu.datagrid_code,
-            menu.id 'key',
-            menu.menu,menu.type,menu.text ,menu.text as title,
-            menu.text as label,
-            menu.icon,
-            menu.router,
-            if(menu.is_leaf='true',true,false ) as  'isLeaf',
-            menu.parent_id
-            from 
-            nanx_portal_menu_list menu
-            left join  nanx_portal_role_menu_permissions menu_role
-            on menu_id=menu.id
-            where  parent_id is NULL ORDER BY menu.listorder";
 
+    $commonsql =   "select   
+    menu_level,datagrid_code,
+    id 'key',
+    text as title,
+    icon,
+    router,
+    if(is_leaf='true',true,false ) as  'isLeaf',
+    parent_id
+    from 
+    nanx_portal_menu_list menu
+    where  ";
+
+    $sql =  $commonsql . "  parent_id is NULL ORDER BY listorder";
     $res = $this->db->query($sql)->result_array();
-    $len1 = count($res);
-    for ($i = 0; $i < $len1; ++$i) {
+    $len_level_1 = count($res);
+    for ($i = 0; $i < $len_level_1; ++$i) {
       $id = $res[$i]['key'];
-      $sql = "select  menu_role.role,  
-              menu.menu_level,menu.datagrid_code,
-              menu.id 'key',
-              menu.menu,menu.type,menu.text ,menu.text as title,menu.icon,
-              menu.router,
-              if(menu.is_leaf='true',true,false ) as  'isLeaf',
-              menu.parent_id 
-              from  nanx_portal_menu_list menu
-              left join  nanx_portal_role_menu_permissions menu_role
-              on menu_id=menu.id
-              where  menu.parent_id='$id' ORDER BY menu.listorder";
+      $sql =  $commonsql . " parent_id='$id' ORDER BY listorder";
       $rows = $this->db->query($sql)->result_array();
       $res[$i]['children'] = $rows;
     }
