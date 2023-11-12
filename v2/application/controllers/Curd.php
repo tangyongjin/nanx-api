@@ -287,7 +287,7 @@ class Curd extends MY_Controller {
 
     public function write_session_log($type, $para, $old_data) {
         if (!array_key_exists('rawdata', $para)) {
-            $para['rawdata'] = $object = new stdClass();
+            $para['rawdata'] = new stdClass();
         }
         $operator = $this->getUser();
         $user = $this->getUser();

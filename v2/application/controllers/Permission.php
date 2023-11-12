@@ -67,23 +67,11 @@ class Permission extends MY_Controller {
   }
 
 
-  public function getRoleList() {
-    $args = (array) json_decode(file_get_contents('php://input'));
-    $page = $args['currentPage'];
-    $size = $args['pageSize'];
-    $page = ($page - 1) * $size;
-    $this->load->model('MPermission');
-    $part = $this->MPermission->addSqlPart($args);
-    $rows = $this->MPermission->getRoleListsIsAddCondition($part, $page, $size);
-    $total = $this->MPermission->queryCount($part);
-    $ret = array('code' => 200, 'msg' => 'success', 'data' => $rows, 'total' => $total);
-    echo json_encode($ret);
-  }
 
 
   public function saveMenuPermission() {
     $args = (array) json_decode(file_get_contents('php://input'));
-    $this->load->model('MPermission');
+
 
     $rolecode = $args['rolecode'];
     $menu_level = $args['menu_level'];
@@ -117,7 +105,7 @@ class Permission extends MY_Controller {
 
   public function deleteMenuPermission() {
     $args = (array) json_decode(file_get_contents('php://input'));
-    $this->load->model('MPermission');
+
 
     $rolecode = $args['rolecode'];
     $menu_level = $args['menu_level'];

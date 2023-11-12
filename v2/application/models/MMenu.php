@@ -48,20 +48,4 @@ class MMenu extends CI_Model {
     }
     return $rows;
   }
-
-  public function getParentText($res) {
-    $len = count($res);
-    for ($i = 0; $i < $len; ++$i) {
-
-      $id = $res[$i]['parent_id'];
-      if ('' != $id || null != $id) {
-        $sql = "select text as  parent_text from nanx_portal_menu_list WHERE id = '$id' ";
-        $row = $this->db->query($sql)->row_array();
-        $res[$i]['parent_text'] = $row['parent_text'];
-        continue;
-      }
-      $res[$i]['parent_text'] = '';
-    }
-    return $res;
-  }
 }
