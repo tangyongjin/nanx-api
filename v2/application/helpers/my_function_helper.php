@@ -126,7 +126,7 @@ function db_exits($table, $col, $val) {
   }
 }
 
-function logtext($para, $user_force = false) {
+function logtext($para) {
   $CI = &get_instance();
   $log = fopen(helper_getlogname(), 'a+');
   if (is_string($para)) {
@@ -349,7 +349,7 @@ function postJson($url, $data) {
 
 
 function response500($msg) {
-  $ret = ['code' => 500, 'msg' => $msg, 'message' => $msg];
+  $ret = ['code' => 500,  'message' => $msg];
   echo json_encode($ret, JSON_UNESCAPED_UNICODE);
   die;
 }
@@ -357,7 +357,6 @@ function response500($msg) {
 function bcsum(array $numbers) {
   $total = "0";
   foreach ($numbers as $onenumber) {
-    // $total = bcadd("'" . $total . "'", "'" . $onenumber . "'", 2);
     $total = bcadd($total, $onenumber, 2);
   }
   return $total;

@@ -9,7 +9,7 @@ class MMenu extends CI_Model {
   public function getTreeMenuList() {
 
     $commonsql =   "select   
-    menu,
+    menu ,
     menu_level,datagrid_code,
     id 'key',
     text as title,

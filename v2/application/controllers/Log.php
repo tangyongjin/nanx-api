@@ -2,10 +2,11 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Log extends CI_Controller
-{
-    function index()
-    {
+class Log extends CI_Controller {
+    function index() {
+
+
+
         $base_url = str_replace('log', '', $_SERVER['REQUEST_SCHEME']   . '://' . $_SERVER['HTTP_HOST'] .  $_SERVER['REQUEST_URI']);
         $base_url = str_replace('Log', '',  $base_url);
 
@@ -34,7 +35,7 @@ class Log extends CI_Controller
             $string = '';
         }
 
-        $php_errmsg = '<h2>PHP_error_logfile: (/tmp/php_error.log)</h2>' . read_file('/tmp/php_error.log');
+        $php_errmsg = '<h2>PHP_error_logfile: (/tmp/php_errors.log)</h2>' . read_file('/tmp/php_errors.log');
         echo "<pre>" . $php_errmsg . "</pre>";
         echo "<h2>app_log_file: $logfile </h2>";
         echo "<br/>";
@@ -55,8 +56,7 @@ class Log extends CI_Controller
     }
 
 
-    public function clearlog()
-    {
+    public function clearlog() {
         file_put_contents(helper_getlogname(), '');
     }
 }
