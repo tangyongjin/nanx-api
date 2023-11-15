@@ -7,6 +7,6 @@ if (!defined('BASEPATH')) {
 class Test extends CI_Controller {
 
     public function index() {
-        echo "index function in index";
+        phpinfo();
     }
 }
