@@ -53,26 +53,8 @@ class Permission extends MY_Controller {
   }
 
 
-
-
-  public function getRolesByMenuId() {
-    $args = (array) json_decode(file_get_contents("php://input"));
-    $menuId = $args['menu_id'];
-    $sql = "SELECT nr.id,nr.role_code,nr.role_name from nanx_portal_role_menu_permissions bp 
-                LEFT JOIN nanx_user_role nr on bp.role=nr.role_code  
-                where bp.menu_id='$menuId'  ";
-    $res = $this->db->query($sql)->result_array();
-    $ret = array("code" => 200, 'data' => $res);
-    echo json_encode($ret);
-  }
-
-
-
-
   public function saveMenuPermission() {
     $args = (array) json_decode(file_get_contents('php://input'));
-
-
     $rolecode = $args['rolecode'];
     $menu_level = $args['menu_level'];
     $menuid = $args['menuid'];
@@ -140,11 +122,22 @@ class Permission extends MY_Controller {
   }
 
 
+  public function getRolesByMenuId() {
+    $args = (array) json_decode(file_get_contents("php://input"));
+    $menuId = $args['menu_id'];
+    $sql = "  select 
+              nanx_user_role.id,
+              nanx_user_role.role_code,
+              nanx_user_role.role_name
+              from
+              nanx_portal_role_menu_permissions 
+              LEFT JOIN nanx_user_role  on  role = role_code
+              where nanx_portal_role_menu_permissions.menu_id = '$menuId' ";
 
-
-
-
-
+    $res = $this->db->query($sql)->result_array();
+    $ret = array("code" => 200, 'data' => $res);
+    echo json_encode($ret);
+  }
 
 
 
@@ -152,13 +145,11 @@ class Permission extends MY_Controller {
     $args = (array) json_decode(file_get_contents("php://input"));
     $menuId = $args['menu_id'];
 
-    $sql = "SELECT nu.id,nr.role_code, nr.role_name, nu.staff_name, nu.head_portrait,nao.dept_name
-                FROM nanx_portal_role_menu_permissions bp 
-                LEFT JOIN nanx_user_role nr ON bp.role = nr.role_code 
-                LEFT JOIN nanx_user_role_assign na ON na.role_code = nr.role_code 
-                LEFT JOIN nanx_user nu ON nu.id = na.userid 
-                LEFT JOIN nanx_organization nao on  nu.deptid=nao.id
-                WHERE bp.menu_id = '$menuId'";
+    $sql = "  select * from  nanx_user where  user in ( select user from  nanx_user_role_assign where role_code in (
+      select nanx_user_role.role_code from nanx_portal_role_menu_permissions LEFT JOIN nanx_user_role  on  role = role_code
+      where nanx_portal_role_menu_permissions.menu_id = '$menuId' )  )    ";
+
+
     $res = $this->db->query($sql)->result_array();
     $data = [];
     foreach ($res as  $value) {

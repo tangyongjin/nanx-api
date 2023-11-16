@@ -132,7 +132,6 @@ class Codecleaner extends CI_Controller {
             'nanx_activity_field_public_display_cfg',
             'nanx_activity_field_special_display_cfg',
             'nanx_activity_forbidden_field',
-            'nanx_activity_js_btns',
             'nanx_biz_column_editor_cfg',
             'nanx_biz_column_follow_cfg',
             'nanx_biz_column_trigger_group',
