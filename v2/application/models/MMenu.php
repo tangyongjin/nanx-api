@@ -6,7 +6,7 @@ class MMenu extends CI_Model {
 
 
 
-  public function getTreeMenuList() {
+  public function getAllTreeMenuList() {
 
     $commonsql =   "select   
     menu ,

@@ -10,8 +10,8 @@ class Permission extends MY_Controller {
     parent::__construct();
   }
 
-  public function getTreeMenuList() {
-    $rows = $this->MMenu->getTreeMenuList();
+  public function getAllTreeMenuList() {
+    $rows = $this->MMenu->getAllTreeMenuList();
     $rows = $this->MMenu->stringToBoolean($rows);
     $ret = array('code' => 200, 'msg' => 'success', 'data' => $rows);
     echo json_encode($ret);
@@ -21,7 +21,7 @@ class Permission extends MY_Controller {
     $args = (array) json_decode(file_get_contents('php://input'));
     $role_code = $args['role_code'];
     // 获取系统所有的菜单
-    $rows = $this->MMenu->getTreeMenuList();
+    $rows = $this->MMenu->getAllTreeMenuList();
     $rows = $this->MMenu->stringToBoolean($rows);
     $menuList = [];
 
