@@ -1,14 +1,8 @@
 <?php
-
 defined('BASEPATH') or exit('No direct script access allowed');
-
 class Button extends MY_Controller {
-
-
-
     public function __construct() {
         parent::__construct();
-
         header('Access-Control-Allow-Origin: * ');
         header('Access-Control-Allow-Headers: Origin, X-Requested-With,Content-Type, Accept,authorization');
         header('Access-Control-Allow-Credentials', true);
@@ -36,18 +30,16 @@ class Button extends MY_Controller {
         echo json_encode($ret, JSON_UNESCAPED_UNICODE);
         return;
     }
+
     public function addGridButton() {
         $json_paras = (array) json_decode(file_get_contents('php://input'), true);
         $btncode  = $json_paras['btncode'];
         $DataGridCode = $json_paras['DataGridCode'];
-
         $already_btns = $this->db->query("select * from nanx_grid_button where datagrid_code='{$DataGridCode}' ")->result_array();
         $counter = count($already_btns);
         $btnorder = intval($counter) + 1;
         $this->db->insert('nanx_portal_button_actcode', ['button_code' => $btncode, 'datagrid_code' => $DataGridCode, 'btnorder' => $btnorder]);
-
         $db_error = $this->db->error();
-
         if (0 == $db_error['code']) {
             $ret = ['code' => 200, 'message' => '添加按钮成功'];
         } else {
@@ -68,7 +60,24 @@ class Button extends MY_Controller {
         if (0 == $db_error['code']) {
             $ret = ['code' => 200, 'message' => '删除按钮成功'];
         } else {
-            $ret = ['code' => $db_error['code'], 'message' => '添加按钮失败,DBcode:' . $db_error['code']];
+            $ret = ['code' => $db_error['code'], 'message' => '删除按钮失败,DBcode:' . $db_error['code']];
+        }
+        echo json_encode($ret, JSON_UNESCAPED_UNICODE);
+        return;
+    }
+
+    public function saveBtnOrder() {
+        $json_paras = (array) json_decode(file_get_contents('php://input'), true);
+        $id  = $json_paras['assign_id'];
+        $btnorder = $json_paras['btnorder'];
+
+        $this->db->where(['id' => $id]);
+        $this->db->update('nanx_portal_button_actcode', ['btnorder' => $btnorder]);
+        $db_error = $this->db->error();
+        if (0 == $db_error['code']) {
+            $ret = ['code' => 200, 'message' => '按钮顺序保存成功'];
+        } else {
+            $ret = ['code' => $db_error['code'], 'message' => '按钮顺序保存失败,DBcode:' . $db_error['code']];
         }
         echo json_encode($ret, JSON_UNESCAPED_UNICODE);
         return;
