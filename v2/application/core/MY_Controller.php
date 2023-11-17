@@ -155,7 +155,7 @@ class MY_Controller extends CI_Controller {
     }
 
     try {
-      $token_decoded = JWT::decode($client_token, 'cnix_key_login_2342342324');
+      $token_decoded = JWT::decode($client_token, 'nanx_xiaoke-20211213');
     } catch (Exception $e) {
       logtext('JWT-decode-failure:' . $e->getMessage());
       return false;
@@ -170,7 +170,7 @@ class MY_Controller extends CI_Controller {
       return false;
     }
 
-    $this->setCustid($token_decoded->id);
+
     $this->setMobile($token_decoded->mobile);
     $this->setUser($token_array['user']);
     return true;

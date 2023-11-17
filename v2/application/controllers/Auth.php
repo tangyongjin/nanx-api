@@ -8,12 +8,6 @@ class Auth extends MY_Controller {
   public function __construct() {
 
     parent::__construct();
-    header('Access-Control-Allow-Origin: * ');
-    header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,authorization,Cache-Control');
-    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-      exit();
-    }
-
     $this->router->fetch_method();
     getallheaders();
     $this->load->helper('my_jwt_helper');
@@ -26,12 +20,10 @@ class Auth extends MY_Controller {
     $this->load->model('MUser');
     $mobile = $this->getMobile();
     $new_pwd = $json_paras['new_pwd'];
+    $salt = randstr(6);
 
-    $row = $this->MUser->getUserbyMobile($mobile);
-    $pwd_try_with_salt = md5(md5($new_pwd) . $row['salt']);
-    $data = array(
-      'password' => $pwd_try_with_salt
-    );
+    $pwd_try_with_salt = md5(md5($new_pwd) .  $salt);
+    $data = ['password' => $pwd_try_with_salt, 'salt' => $salt];
     $this->db->where('mobile', $mobile);
     $this->db->update('nanx_user', $data);
     $db_error = $this->db->error();
@@ -50,12 +42,9 @@ class Auth extends MY_Controller {
     $this->load->model('MUser');
     $mobile = $json_paras['mobile'];
     $new_pwd = '12345678';
-
-    $row = $this->MUser->getUserbyMobile($mobile);
-    $pwd_try_with_salt = md5(md5($new_pwd) . $row['salt']);
-    $data = array(
-      'password' => $pwd_try_with_salt
-    );
+    $salt = randstr(6);
+    $pwd_try_with_salt = md5(md5($new_pwd) .   $salt);
+    $data = ['password' => $pwd_try_with_salt, 'salt' => $salt];
     $this->db->where('mobile', $mobile);
     $this->db->update('nanx_user', $data);
     $db_error = $this->db->error();
@@ -73,7 +62,7 @@ class Auth extends MY_Controller {
   function profile() {
 
     $user = $this->getUser();
-    $profile = $this->MUser->userprofile($user);
+    $profile = $this->MUser->getUserProfile($user);
     $ret = array(
       "code" => 200,
       "message" => "success",
@@ -83,100 +72,26 @@ class Auth extends MY_Controller {
   }
 
 
-
-
-  public function JWT_login() {
-    logtext("进入登陆");
-    $json_paras = (array) json_decode(file_get_contents('php://input'));
-
-    $secret_key = 'cnix_key_login_2342342324';
-    $valid_for = '36000000';
-
-    if (!array_key_exists('mobile', $json_paras)) {
-      http_response_code(401);
-
-      return false;
-    }
-    if (!array_key_exists('password', $json_paras)) {
-      http_response_code(401);
-
-      return false;
-    }
-    $mobile =   $json_paras['mobile'];
-    $password = $json_paras['password'];
-
-
-    $trylogin = $this->db_login($mobile, $password);
-    // $trylogin = 'success';
-    if (!('success' == $trylogin)) {
-      $ret = array('code' => 401, 'message' => 'Message:[mobile/password] not match');
-      http_response_code(401);
-      echo json_encode($ret);
-      return false;
-    }
-
-
-
-    $data = array(
-      'transaction_id'  => randstr(10),
-      'update_datetime' => date('Y-m-d h:i:sa'),
-      'scanner_mobile'  => $mobile,
-      'session_id'      => $password,
-    );
-
-    $this->db->insert('nanx_qrcode_login_session', $data);
-    $this->load->helper('my_jwt_helper');
-    $res = $this->MUser->getUserByMobile($mobile);
-    $user = $res['user'];
-    $token = array();
-    $token['id'] = $res['id'];
-    $token['mobile'] = $mobile;
-    $token['exp'] = time() + $valid_for;
-    $token['user'] = $res['user'];
-    $message_count = 0;
-    $addresss_count = 0;
-    $affair_count = 0;
-    $badge_sum = 0;
-    $profile = $this->MUser->userprofile($user);
-    $ret = [];
-    $ret = array(
-      'tags' => 'jenkins',
-      'token'          => JWT::encode($token, $secret_key),
-      'badge_sum'      => $badge_sum,
-      'addresss_count' => $addresss_count,
-      'message_count'  => $message_count,
-      'affair_count'   => $affair_count,
-      'profile'        => $profile,
-      'code' => 200
-    );
-
-    echo json_encode($ret);
-  }
-
   public function loginMobile() {
-    sleep(1.5);
+    sleep(1);
     logtext("进入登陆");
     $json_paras = (array) json_decode(file_get_contents('php://input'));
 
-    $secret_key = 'cnix_key_login_2342342324';
-    $valid_for = '36000000';
+
 
     if (!array_key_exists('mobile', $json_paras)) {
       http_response_code(401);
-
       return false;
     }
+
     if (!array_key_exists('password', $json_paras)) {
       http_response_code(401);
-
       return false;
     }
+
     $mobile =   $json_paras['mobile'];
     $password = $json_paras['password'];
-
-
     $trylogin = $this->db_login($mobile, $password);
-    // $trylogin = 'success';
     if (!('success' == $trylogin)) {
       $ret = array('code' => 401, 'message' => 'Message:[mobile/password] not match');
       http_response_code(401);
@@ -184,46 +99,36 @@ class Auth extends MY_Controller {
       return false;
     }
 
+    $userRow = $this->MUser->getUserByMobile($mobile);
+    $user = $userRow['user'];
+    $profile = $this->MUser->getUserProfile($user);
 
 
-    $data = array(
-      'transaction_id'  => $json_paras['transaction_id'],
-      'update_datetime' => date('Y-m-d h:i:sa'),
-      'scanner_mobile'  => $mobile,
-      'session_id'      => $password,
-    );
-
-    $this->db->insert('nanx_qrcode_login_session', $data);
-    $this->load->helper('my_jwt_helper');
-    $res = $this->MUser->getUserByMobile($mobile);
-    $user = $res['user'];
-    $token = array();
-    $token['id'] = $res['id'];
-    $token['mobile'] = $mobile;
-    $token['exp'] = time() + $valid_for;
-    $token['user'] = $res['user'];
-    $message_count = 0;
-    $addresss_count = 0;
-    $affair_count = 0;
-    $badge_sum = 0;
-    $profile = $this->MUser->userprofile($user);
     $ret = [];
-    $ret = array(
-      'tags' => 'jenkins',
-      'token'          => JWT::encode($token, $secret_key),
-      'badge_sum'      => $badge_sum,
-      'addresss_count' => $addresss_count,
-      'message_count'  => $message_count,
-      'affair_count'   => $affair_count,
-      'profile'        => $profile,
-      'code' => 200
-    );
+    if (empty($profile['role_code'])) {
+      $ret = ['profile' => $profile, 'code' => 500, 'message' => '该用户无任何角色'];
+      echo json_encode($ret);
+      return;
+    }
 
+    $data = ['transaction_id' => $json_paras['transaction_id'], 'login_datetime' => date('Y-m-d h:i:sa'), 'mobile' => $mobile];
+    $this->db->insert('nanx_qrcode_login_session', $data);
+
+    $ret = ['token' =>  $this->JwtToken($mobile, $user),   'profile' => $profile, 'code' => 200];
     echo json_encode($ret);
   }
 
 
-
+  public  function JwtToken($mobile, $user) {
+    $this->load->helper('my_jwt_helper');
+    $secret_key = 'nanx_xiaoke-20211213';
+    $valid_for = '36000000';
+    $token = [];
+    $token['mobile'] = $mobile;
+    $token['exp'] = time() + $valid_for;
+    $token['user'] = $user;
+    return JWT::encode($token, $secret_key);
+  }
 
 
   public function db_login($mobile, $pwd_try) {
@@ -251,7 +156,6 @@ class Auth extends MY_Controller {
 
   public function logout() {
     http_response_code(401);
-
     return false;
     die();
   }

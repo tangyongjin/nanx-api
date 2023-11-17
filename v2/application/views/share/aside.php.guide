@@ -75,7 +75,7 @@ echo "is_weixin=" . intval($is_weixin) . ";";
 
             function show_user_profile(){
                 var tpl='<div>'+'球场id'+courseid+'<br/>用户id:'+uid+'<br/>是否有卡:'+havecard+'<br/>用户余额:'+user_credit+'<br/>卡号:'+cardno+'</div>'
-                var last = $('#userprofile').last();
+                var last = $('#getUserProfile').last();
                 $(tpl).appendTo(last);
 
             }
@@ -91,7 +91,7 @@ echo "is_weixin=" . intval($is_weixin) . ";";
   <header class="am-panel-hd">
     <h3 class="am-panel-title">用户余额</h3>
   </header>
-  <div class="am-panel-bd" id="userprofile">
+  <div class="am-panel-bd" id="getUserProfile">
 
   </div>
 </section>

@@ -150,15 +150,12 @@ class Permission extends MY_Controller {
       where nanx_portal_role_menu_permissions.menu_id = '$menuId' )  )    ";
 
 
-    $res = $this->db->query($sql)->result_array();
+    $users = $this->db->query($sql)->result_array();
     $data = [];
-    foreach ($res as  $value) {
-      if ($value['head_portrait'] == "" || $value['head_portrait'] == NULL) {
-        $value['head_portrait'] = 'http://' . $_SERVER['HTTP_HOST'] . "/avatar/common_avatar.png";
-      } else {
-        $value['head_portrait'] = $value['head_portrait'];
-      }
-      $data[] = $value;
+    foreach ($users as  $user) {
+
+      $user['head_portrait'] = $this->MUser->getUserPortrait($user);
+      $data[] = $user;
     }
     $ret = array("code" => 200, 'data' => $data);
     echo json_encode($ret);
