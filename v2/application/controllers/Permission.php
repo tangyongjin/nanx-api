@@ -160,4 +160,49 @@ class Permission extends MY_Controller {
     $ret = array("code" => 200, 'data' => $data);
     echo json_encode($ret);
   }
+
+
+
+  public function getAllRoles() {
+    $sql = "  select * from nanx_user_role ";
+    $res = $this->db->query($sql)->result_array();
+    $ret = array("code" => 200, 'roles' => $res);
+    echo json_encode($ret);
+  }
+
+
+  public function getUserRole() {
+    $args = (array) json_decode(file_get_contents('php://input'));
+    $user = $args['user'];
+    $role = $this->MUser->getUserRole($user);
+    $ret = array("code" => 200, 'role' => $role);
+    echo json_encode($ret);
+  }
+
+  public function assignUserRole() {
+    $args = (array) json_decode(file_get_contents('php://input'));
+    $user = $args['user'];
+    $role = $args['role_code'];
+
+    $this->deleteUserRoleHandler($user, $role);
+    $this->db->insert('nanx_user_role_assign', ['user' => $user, 'role_code' => $role]);
+    $ret = array("code" => 200, 'message' => '分配成功');
+    echo json_encode($ret);
+  }
+
+  public function deleteUserRole() {
+    $args = (array) json_decode(file_get_contents('php://input'));
+    $user = $args['user'];
+    $role = $args['role'];
+    $this->deleteUserRoleHandler($user, $role);
+    $ret = array("code" => 200, 'message' => '删除成功');
+    echo json_encode($ret);
+  }
+
+
+  public function deleteUserRoleHandler($user, $role) {
+    $data = ['user' => $user, 'role_code' => $role];
+    $this->db->where($data);
+    $this->db->delete('nanx_user_role_assign');
+  }
 }

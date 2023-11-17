@@ -54,7 +54,8 @@ class MUser  extends CI_Model {
 
   public function getUserRole($user) {
 
-    $sql = "select  nanx_user_role_assign.role_code,role_name
+    $sql = "select  nanx_user_role_assign.id, nanx_user_role_assign.role_code,
+              role_name,nanx_user_role_assign.user 
               from nanx_user_role_assign,nanx_user_role
               where user='{$user}'
               and   nanx_user_role.role_code=nanx_user_role_assign.role_code limit 1";
