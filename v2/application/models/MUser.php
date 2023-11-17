@@ -37,7 +37,7 @@ class MUser  extends CI_Model {
   }
 
 
-  private function getUserPortrait($userinfo) {
+  public function getUserPortrait($userinfo) {
 
     if (is_null($userinfo['head_portrait'])) {
       $head_portrait = '/avatar/common_avatar.png';

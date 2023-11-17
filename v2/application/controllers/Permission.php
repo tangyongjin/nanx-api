@@ -152,6 +152,7 @@ class Permission extends MY_Controller {
 
     $users = $this->db->query($sql)->result_array();
     $data = [];
+    $this->load->model('MUser');
     foreach ($users as  $user) {
 
       $user['head_portrait'] = $this->MUser->getUserPortrait($user);
