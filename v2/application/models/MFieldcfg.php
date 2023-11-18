@@ -2,62 +2,6 @@
 
 class MFieldcfg extends CI_Model {
 
-    function getMysqlDataTypes($range) {
-        $data_types = array(
-            'bigint',
-            'binary',
-            'bit',
-            'blob',
-            'bool',
-            'boolean',
-            'char',
-            'date',
-            'datetime',
-            'decimal',
-            'double',
-            'enum',
-            'float',
-            'int',
-            'longblob',
-            'longtext',
-            'mediumblob',
-            'mediumint',
-            'mediumtext',
-            'numeric',
-            'real',
-            'set',
-            'smallint',
-            'text',
-            'time',
-            'timestamp',
-            'tinybolb',
-            'tinyint',
-            'tinytext',
-            'varbinary',
-            'varchar',
-            'year'
-        );
-
-        $data_types_need_wrapper = array(
-            'char',
-            'date',
-            'datetime',
-            'text',
-            'time',
-            'timestamp',
-            'varchar'
-        );
-
-        if ($range == 'all') {
-            return $data_types;
-        }
-        if ($range == 'have_length') {
-            return $data_types;
-        }
-        if ($range == 'wrap') {
-            return $data_types_need_wrapper;
-        }
-    }
 
 
     //all_db_fields 为所有字段, 获取所有的字段的配置,
@@ -145,8 +89,6 @@ class MFieldcfg extends CI_Model {
 
 
     function getEditorCfg($datagrid_code, $base_table, $db_field) {
-
-
         $editor_cfg = $this->getCommonEditCfg($datagrid_code, $base_table, $db_field['Field']);
         if (strlen($editor_cfg['uform_plugin']) < 3) {
             // 没有找到 特别的 uform_plugin 配置,根据数据库类型来转换
@@ -225,40 +167,93 @@ class MFieldcfg extends CI_Model {
 
     function toUnformType($field_type) {
 
-        $data_types = $this->getMysqlDataTypes('all');  //所有的mysql类型.
-        $mysql_type_found = 'char';  // 即使找不到也缺省为 char
+        $uform_type = 'string';  // 即使找不到也缺省为 string
 
-        foreach ($data_types as $mysql_type) {
-            if (strpos($field_type, $mysql_type)   !== false) {
-                $mysql_type_found = $mysql_type;
-                continue;
+        $mysql_num_fields = [
+            'bigint',
+            'int',
+            'float',
+            'bit',
+            'mediumint',
+            'numeric',
+            'real',
+            'smallint',
+            'tinyint',
+            'decimal',
+            'double',
+            'year'
+        ];
+
+        $mysql_char_fields = [
+            'char',
+            'varchar',
+        ];
+
+        $mysql_text_fields = [
+            'text',
+            'tinytext',
+            'longtext',
+            'mediumtext',
+        ];
+
+        $mysql_datetime_fields = [
+            'date',
+            'datetime',
+            'time',
+            'timestamp',
+        ];
+
+        $mysql_blob_fields = [
+            'binary',
+            'blob',
+            'bool',
+            'boolean',
+            'enum',
+            'longblob',
+            'mediumblob',
+            'set',
+            'tinybolb',
+            'varbinary',
+        ];
+
+        if (in_array($field_type, $mysql_num_fields)) {
+            $uform_type = 'number';
+        }
+
+
+        if (in_array($field_type, $mysql_char_fields)) {
+            $uform_type = 'string';
+        }
+
+        if (in_array($field_type, $mysql_text_fields)) {
+            $uform_type = 'textarea';
+        }
+
+
+        if (in_array($field_type, $mysql_datetime_fields)) {
+
+            if ($field_type == 'date') {
+                return 'UDateEditor';
             }
+
+            if ($field_type == 'datetime') {
+                return 'UDateTimeEditor';
+            }
+
+            if ($field_type == 'timestamp') {
+                return 'UDateTimeEditor';
+            }
+
+            if ($field_type == 'time') {
+                return 'UTimeEditor';
+            }
+            $uform_type = 'textarea';
         }
-        $uform_type = $this->convertToUformType($mysql_type_found);
+
+        if (in_array($field_type, $mysql_blob_fields)) {
+            $uform_type = 'UBlobEditor';
+        }
+
         return    $uform_type;
-    }
-
-
-    function convertToUformType($field_type) {
-
-        $upper_field_type = strtoupper($field_type);
-
-        if (in_array($upper_field_type, ['STRING', 'CHAR', 'VARCHAR', 'TINYBLOB', 'TINYTEXT', 'ENUM', 'SET'])) {
-            return 'string';    // uform string
-        }
-
-        if (in_array($upper_field_type, ['TEXT', 'LONGTEXT', 'MEDIUMTEXT'])) {
-            return 'textarea'; // uform textarea
-        }
-
-        if (in_array($upper_field_type, ['DATE', 'TIME', 'DATETIME', 'TIMESTAMP'])) {
-            return 'UDateEditor';    // bugfix ==> UDateEditor
-        }
-
-        if (in_array($upper_field_type, ['INT', 'INTEGER', 'BIGINT', 'TINYINT', 'MEDIUMINT', 'DECIMAL', 'DOUBLE', 'SMALLINT', 'YEAR', 'FLOAT', 'REAL'])) {
-            return 'number';    //通用的字符串组件
-        }
-
-        return 'string';
     }
 }
