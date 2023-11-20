@@ -169,6 +169,7 @@ class MFieldcfg extends CI_Model {
 
         $uform_type = 'string';  // 即使找不到也缺省为 string
 
+
         $mysql_num_fields = [
             'bigint',
             'int',
@@ -233,21 +234,20 @@ class MFieldcfg extends CI_Model {
         if (in_array($field_type, $mysql_datetime_fields)) {
 
             if ($field_type == 'date') {
-                return 'UDateEditor';
+                $uform_type = 'UDateEditor';
             }
 
             if ($field_type == 'datetime') {
-                return 'UDateTimeEditor';
+                $uform_type = 'UDateTimeEditor';
             }
 
             if ($field_type == 'timestamp') {
-                return 'UDateTimeEditor';
+                $uform_type = 'UDateTimeEditor';
             }
 
             if ($field_type == 'time') {
-                return 'UTimeEditor';
+                $uform_type = 'UTimeEditor';
             }
-            $uform_type = 'textarea';
         }
 
         if (in_array($field_type, $mysql_blob_fields)) {
