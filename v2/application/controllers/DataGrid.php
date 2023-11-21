@@ -8,7 +8,6 @@ if (!defined('BASEPATH')) {
 }
 
 class DataGrid extends MY_Controller {
-
   public function __construct() {
     parent::__construct();
     header('Access-Control-Allow-Origin: * ');
@@ -75,13 +74,12 @@ class DataGrid extends MY_Controller {
 
       //强制的显示配置
       $this->db->where(['datagrid_code' => $actcode, 'field_e' => $column['Field']]);
-      $this->db->select(['field_c',  'grouptitle', 'field_width', 'label_width', 'show_as_pic', 'width', 'handler']);
+      $this->db->select(['field_c', 'field_width', 'label_width', 'show_as_pic', 'width', 'handler']);
       $row = $this->db->get('nanx_activity_field_special_display_cfg')->row_array();
 
       $tmp['width'] = '';
       $tmp['handler'] = '';
       $tmp['label'] = '';
-      $tmp['grouptitle'] = '';
 
 
       if ($row) {
@@ -89,17 +87,16 @@ class DataGrid extends MY_Controller {
         $tmp['width'] = $row['width'];
         $tmp['handler'] = $row['handler'];
         $tmp['label'] = $row['field_c'];
-        $tmp['grouptitle'] = $row['grouptitle'];
       }
 
-      //form 中是否隐藏  
+      //form 中是否隐藏
 
       $ForbiddenFields = array_column($this->MFieldcfg->getForbiddenFields($para['DataGridCode'], 'form_hidden'), 'field');
       $tmp['form_hidden'] = false;
       if (in_array($column['Field'], $ForbiddenFields)) {
         $tmp['form_hidden'] = true;
       }
-      //column 中是否隐藏  
+      //column 中是否隐藏
 
       $ForbiddenFields = array_column($this->MFieldcfg->getForbiddenFields($para['DataGridCode'], 'column_hidden'), 'field');
 
@@ -111,14 +108,17 @@ class DataGrid extends MY_Controller {
 
 
       //nanx_biz_column_editor_cfg ,控制 是否只读/插件名称
-      $tmp['readonly'] = false;
+
       $tmp['pluginname'] = $this->MFieldcfg->toUnformType($column['Type']);
+      $tmp['readonly'] = false;
+      $tmp['uform_para'] = null;
+      $tmp['default_v'] = null;
+
 
       $this->db->where(['datagrid_code' => $para['DataGridCode'], 'base_table' => $base_table, 'field_e' => $column['Field']]);
       $row = $this->db->get('nanx_biz_column_editor_cfg')->row_array();
-
-
       if ($row) {
+
         if (intval($row['readonly']) == 1) {
           $tmp['readonly'] = true;
         }
@@ -128,6 +128,7 @@ class DataGrid extends MY_Controller {
         }
 
         $tmp['uform_para'] = $row['uform_para'];
+        $tmp['default_v'] = $row['default_v'];
       }
 
       //字典表 配置
@@ -138,7 +139,8 @@ class DataGrid extends MY_Controller {
       if ($row) {
         $tmp['category'] = $row['codetable_category_value'];
       }
-      $tmp['initvalue'] = '';
+
+
       $fixed[] = $tmp;
     }
 
@@ -149,7 +151,7 @@ class DataGrid extends MY_Controller {
 
 
 
-  public  function saveTriggerGroup() {
+  public function saveTriggerGroup() {
 
     $ret = [];
     $post = file_get_contents('php://input');
@@ -277,9 +279,32 @@ class DataGrid extends MY_Controller {
 
   public function saveFieldCfgHandler($actcode, $base_table, $para) {
 
-    if (!array_key_exists('uform_para', $para)) {
-      $para['uform_para'] = '';
-    }
+
+    // 修改  label
+    $this->_saveFieldLabelHandler($actcode, $base_table, $para);
+
+
+    // 列 render
+    $this->_saveFieldColRenderHandler($actcode, $base_table, $para);
+
+
+    // 列  编辑配置
+    $this->_saveFieldColmnEditorHandler($actcode, $base_table, $para);
+
+
+    // 列隐藏设置
+    $this->_saveFieldHiddenConfigure($actcode, $para);
+
+    // 字典表配置
+    $this->_saveFieldCategeoryHandler($actcode, $base_table, $para);
+
+    // 初始值配置
+    $this->_saveFieldInitValueHandler($actcode, $base_table, $para);
+  }
+
+
+  private function _saveFieldLabelHandler($actcode, $base_table, $para) {
+
     // 修改  label
     if (strlen($para['label']) > 1) {
       $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
@@ -288,20 +313,15 @@ class DataGrid extends MY_Controller {
         $this->db->update('nanx_activity_field_special_display_cfg', ['field_c' => $para['label']], $wherecfg);
       } else {
         $wherecfg['field_c'] = $para['label'];
-        $this->db->insert('nanx_activity_field_special_display_cfg',  $wherecfg);
+        $this->db->insert('nanx_activity_field_special_display_cfg', $wherecfg);
       }
     }
+  }
 
-    if (strlen($para['width']) > 1) {
-      $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
-      $rows = $this->db->get_where('nanx_activity_field_special_display_cfg', $wherecfg)->result_array();
-      if (count($rows) == 1) {
-        $this->db->update('nanx_activity_field_special_display_cfg', ['width' => $para['width']], $wherecfg);
-      } else {
-        $wherecfg['width'] = $para['width'];
-        $this->db->insert('nanx_activity_field_special_display_cfg',  $wherecfg);
-      }
-    }
+
+  // 列 render
+
+  private function _saveFieldColRenderHandler($actcode, $base_table, $para) {
 
     if (strlen($para['handler']) > 1) {
       $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
@@ -310,7 +330,7 @@ class DataGrid extends MY_Controller {
         $this->db->update('nanx_activity_field_special_display_cfg', ['handler' => $para['handler']], $wherecfg);
       } else {
         $wherecfg['handler'] = $para['handler'];
-        $this->db->insert('nanx_activity_field_special_display_cfg',  $wherecfg);
+        $this->db->insert('nanx_activity_field_special_display_cfg', $wherecfg);
       }
     }
 
@@ -318,58 +338,60 @@ class DataGrid extends MY_Controller {
       $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
       $this->db->update('nanx_activity_field_special_display_cfg', ['handler' => null], $wherecfg);
     }
+  }
 
 
+  // 列 编辑 handler
+
+  private function _saveFieldColmnEditorHandler($actcode, $base_table, $para) {
     $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
     $rows = $this->db->get_where('nanx_biz_column_editor_cfg', $wherecfg)->result_array();
     if (count($rows) == 1) {
-
       $this->db->update(
         'nanx_biz_column_editor_cfg',
-        ['readonly' => $para['readonly'], 'uform_para' => $para['uform_para'],  'uform_plugin' => $para['pluginname']],
+        ['readonly' => $para['readonly'],  'default_v' => $para['default_v'], 'uform_para' => $para['uform_para'],  'uform_plugin' => $para['pluginname']],
         $wherecfg
       );
     } else {
 
       $wherecfg['readonly'] = $para['readonly'];
+      $wherecfg['default_v'] =  $para['default_v'];
       $wherecfg['uform_plugin'] = $para['pluginname'];
       $wherecfg['uform_para'] = $para['uform_para'];
-      $this->db->insert('nanx_biz_column_editor_cfg',  $wherecfg);
+      $this->db->insert('nanx_biz_column_editor_cfg', $wherecfg);
     }
+  }
 
+  // 列隐藏设置
+  private function _saveFieldHiddenConfigure($actcode, $para) {
 
-
-    //form 是否隐藏  
+    //form 是否隐藏
     $wherecfg = ['datagrid_code' => $actcode,   'field' => $para['Field'], 'forbidden_type' => 'form_hidden'];
 
-    //先清空
     $this->db->where($wherecfg);
     $this->db->delete('nanx_activity_forbidden_field');
     if (intval($para['form_hidden']) == 1) {
       $this->db->insert('nanx_activity_forbidden_field', $wherecfg);
     }
 
-    //table 是否隐藏  
+    //table 是否隐藏
     $wherecfg = ['datagrid_code' => $actcode,   'field' => $para['Field'], 'forbidden_type' => 'column_hidden'];
-
-    //先清空
     $this->db->where($wherecfg);
     $this->db->delete('nanx_activity_forbidden_field');
+
     if (intval($para['column_hidden']) == 1) {
       $this->db->insert('nanx_activity_forbidden_field', $wherecfg);
     }
+  }
 
-
+  private function _saveFieldCategeoryHandler($actcode, $base_table, $para) {
     // 字典表配置
-    //category nanx_biz_column_trigger_group  Field
-
-    $wherecfg = ['actcode' => $actcode, 'base_table' => $base_table, 'field_e' => $para['Field'], 'combo_table' => 'nanx_code_table'];
-    $this->db->where($wherecfg);
-    $this->db->delete('nanx_biz_column_trigger_group');
-
-
-    // $para['category'] 有设置才是使用字典表,否则不需要操作. 
     if (strlen($para['category']) > 1) {
+
+      $wherecfg = ['actcode' => $actcode, 'base_table' => $base_table, 'field_e' => $para['Field'], 'combo_table' => 'nanx_code_table'];
+      $this->db->where($wherecfg);
+      $this->db->delete('nanx_biz_column_trigger_group');
+
       $data = $wherecfg;
       $data['level'] = 1;
       $data['group_name'] = '字典表_' . $para['category'];
@@ -383,8 +405,13 @@ class DataGrid extends MY_Controller {
   }
 
 
+  private function  _saveFieldInitValueHandler($actcode, $base_table, $para) {
+  }
 
-  function getAllCategory() {
+
+
+
+  public function getAllCategory() {
     $sql = " select distinct  category  as  catid,  category as  catname from nanx_code_table";
     $ret = ['code' => 200, 'data' => $this->db->query($sql)->result_array()];
     echo json_encode($ret, JSON_UNESCAPED_UNICODE);
