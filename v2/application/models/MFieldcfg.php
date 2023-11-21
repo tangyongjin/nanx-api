@@ -73,16 +73,16 @@ class MFieldcfg extends CI_Model {
 
         if (empty($common)) {
             $common          = array();
-            $common['found'] = false;
             $common['uform_plugin'] = '';
             $common['uform_para'] = '';
+            $common['default_v'] = null;
             unset($common['id']);
         } else {
             unset($common['base_table']);
             unset($common['field_e']);
             $common['uform_plugin'] = $common['uform_plugin'];
             $common['uform_para'] = $common['uform_para'];
-            $common['found'] = true;
+            $common['default_v'] =  $common['default_v'];
         }
         return $common;
     }
