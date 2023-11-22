@@ -30,18 +30,14 @@ class Curd extends MY_Controller {
             'user' => $para['user']
         ];
 
-
-
-
-        $result2  =  $this->MGridDataPipeRunner->GridDataHandler($get_data_config);
+        $result  =  $this->MGridDataPipeRunner->GridDataHandler($get_data_config);
         $ret = [];
         $ret['code'] = 200;
-        $ret['data'] = $result2['realrows'];
-        $ret['total'] = (int) $result2['total'];
-        $ret['rows'] = count($result2['realrows']);
-        $ret['sql'] = $result2['lastsql'];
-        $ret['debug'] = $result2;
-
+        $ret['data'] = $result['realrows'];
+        $ret['total'] = (int) $result['total'];
+        $ret['rows'] = count($result['realrows']);
+        $ret['sql'] = $result['lastsql'];
+        $ret['debug'] = $result;
         echo json_encode($ret);
     }
 
@@ -66,10 +62,6 @@ class Curd extends MY_Controller {
         $this->MExcel->exportExcel($actcfg['DataGridMeta']['datagrid_title'], $cols, $records);
     }
 
-
-
-
-
     public function addData() {
         $post = file_get_contents('php://input');
         $para = (array) json_decode($post);
@@ -84,8 +76,6 @@ class Curd extends MY_Controller {
         $rawData = array_merge($rawData, $flowInitMeta);
 
 
-
-
         //前台送来的数据,把null改成''了.这里要重新转换下,用rdbms的not null 来约束数据
         $rawData_after_null_fix = $this->MRdbms->fixNull($base_table, $rawData);
         $this->db->insert($base_table, $rawData_after_null_fix);
@@ -96,19 +86,9 @@ class Curd extends MY_Controller {
 
 
         if (0 == $errno) {
-            $resp = array(
-                'success' => true,
-                'code'    => 200,
-                'dbcode' => 0,
-                'message'     => '数据添加成功'
-            );
+            $resp = ['success' => true, 'code' => 200, 'dbcode' => 0, 'message' => '数据添加成功'];
         } else {
-            $resp = array(
-                'success' => false,
-                'code'    => 500,
-                'dbcode' => $errno,
-                'message'     =>  $errno . ' :' . $err_msg,
-            );
+            $resp = ['success' => false, 'code' => 500, 'dbcode' => $errno, 'message' =>  $errno . ' :' . $err_msg,];
         }
 
         $tranferd_resp = $this->transErrorMsg($base_table, $resp);
@@ -138,8 +118,6 @@ class Curd extends MY_Controller {
 
         $rawData_after_null_fix = $this->MRdbms->fixNull($base_table, $rawData);
 
-
-
         $this->db->where('id', $id);
         $sql_mode = " SET SQL_MODE='STRICT_ALL_TABLES' ";
         $this->db->query($sql_mode);
@@ -151,19 +129,9 @@ class Curd extends MY_Controller {
         $err_msg = $err['message'];
 
         if (0 == $errno) {
-            $resp = array(
-                'success' => true,
-                'code'    => 200,
-                'dbcode' => $errno,
-                'message'     =>  '修改成功'
-            );
+            $resp = ['success' => true, 'code' => 200, 'dbcode' => $errno, 'message' => '修改成功'];
         } else {
-            $resp = array(
-                'success' => false,
-                'code'    => 500,
-                'dbcode'    => $errno,
-                'message'     => $errno . $err_msg,
-            );
+            $resp = ['success' => false, 'code' => 500, 'dbcode' => $errno, 'message' => $errno . $err_msg,];
         }
 
         $tranferd_resp = $this->transErrorMsg($base_table, $resp);
@@ -213,7 +181,6 @@ class Curd extends MY_Controller {
         }
 
         if (1062 == $resp['dbcode']) {
-
             $words = explode("'", $resp['message']);
             $field = $words[1];
             $this->load->model('MFieldcfg');
@@ -223,8 +190,6 @@ class Curd extends MY_Controller {
             $tranferd_resp['message'] =   $resp['message'];
             return $tranferd_resp;
         }
-
-
         return $resp;
     }
 
@@ -267,17 +232,9 @@ class Curd extends MY_Controller {
         }
 
         if (0 == $total_error) {
-            $resp = array(
-                'code' => 200,
-                'success' => true,
-                'message'     => '删除成功'
-            );
+            $resp = ['code' => 200, 'success' => true, 'message' => '删除成功'];
         } else {
-            $resp = array(
-                'code' => 500,
-                'success' => false,
-                'message'     => '删除失败'
-            );
+            $resp = ['code' => 500, 'success' => false, 'message' => '删除失败'];
         }
 
         $this->write_session_log('delete', $p, $rows_deleted);
@@ -291,14 +248,14 @@ class Curd extends MY_Controller {
         }
         $operator = $this->getUser();
         $user = $this->getUser();
-        $log_data = array(
-            'user'       => $operator . '[' . $user . ']',
+        $log_data = [
+            'user' => $operator . '[' . $user . ']',
             'action_cmd' => $type,
             'ts' => date("Y-m-d H:i:s", time()),
             'datagrid_code'   => $para['DataGridCode'],
-            'table'      => $para['table'],
-            'rawdata'    => json_encode((array) $para['rawdata']),
-        );
+            'table' => $para['table'],
+            'rawdata' => json_encode((array) $para['rawdata'])
+        ];
 
         switch ($type) {
             case 'add':
@@ -351,6 +308,13 @@ class Curd extends MY_Controller {
 
         $rows = $this->db->get($basetable)->result_array();
         $ret['data'] = $rows;
+        $ret['code'] = 200;
+        echo json_encode($ret);
+    }
+
+    public function remoteCommonFetch() {
+        $ret = [];
+        $ret['value'] = '1984' . randstr(10);
         $ret['code'] = 200;
         echo json_encode($ret);
     }

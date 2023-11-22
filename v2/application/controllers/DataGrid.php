@@ -113,6 +113,7 @@ class DataGrid extends MY_Controller {
       $tmp['readonly'] = false;
       $tmp['uform_para'] = null;
       $tmp['default_v'] = null;
+      $tmp['defaultv_para'] = null;
 
 
       $this->db->where(['datagrid_code' => $para['DataGridCode'], 'base_table' => $base_table, 'field_e' => $column['Field']]);
@@ -129,6 +130,7 @@ class DataGrid extends MY_Controller {
 
         $tmp['uform_para'] = $row['uform_para'];
         $tmp['default_v'] = $row['default_v'];
+        $tmp['defaultv_para'] = $row['defaultv_para'];
       }
 
       //字典表 配置
@@ -349,7 +351,13 @@ class DataGrid extends MY_Controller {
     if (count($rows) == 1) {
       $this->db->update(
         'nanx_biz_column_editor_cfg',
-        ['readonly' => $para['readonly'],  'default_v' => $para['default_v'], 'uform_para' => $para['uform_para'],  'uform_plugin' => $para['pluginname']],
+        [
+          'readonly' => $para['readonly'],
+          'default_v' => $para['default_v'],
+          'defaultv_para' => $para['defaultv_para'],
+          'uform_para' => $para['uform_para'],
+          'uform_plugin' => $para['pluginname']
+        ],
         $wherecfg
       );
     } else {

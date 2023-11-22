@@ -182,6 +182,8 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         }
 
         $xprops['default_v'] = $col['editor_cfg']['default_v'];
+        $xprops['defaultv_para'] = $col['editor_cfg']['defaultv_para'];
+
         return  $xprops;
     }
 
