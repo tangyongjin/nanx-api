@@ -127,29 +127,14 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
 
 
     public function reorderColumns() {
-        $unSorted = $this->payload['total_cols_cfg'];
+
+
         $gridcode = $this->payload['DataGridCode'];
         $sql = " select  distinct  datagrid_code, column_field  from nanx_activity_column_order where datagrid_code='$gridcode'  ";
-        $rows = $this->db->query($sql)->result_array();
-        $sorted = [];
-        if (count($rows) == 0) {
-            return;
-        }
-
-        foreach ($rows as  $row) {
-            $field = $row['column_field'];
-            foreach ($unSorted as  $key2 => $column) {
-                $field_not_sorted = $column['field_e'];
-                if ($field_not_sorted == $field) {
-                    $sorted[] = $unSorted[$key2];
-                    continue;
-                }
-            }
-        }
-        $this->payload['total_cols_cfg'] = $sorted;
+        $Array_display_order = $this->db->query($sql)->result_array();
+        $_sorted_all = $this->MFieldcfg->_sortFieldDisplayOrder($this->payload['total_cols_cfg'], $Array_display_order);
+        $this->payload['total_cols_cfg'] = $_sorted_all;
     }
-
-
 
 
     public function setFormUsedColumns() {

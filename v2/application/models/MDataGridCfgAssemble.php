@@ -51,9 +51,6 @@ class MDataGridCfgAssemble extends CI_Model {
             ->pipe(function ($config) {
                 $this->MDataGridCfgExecutor->setUFormConfig();
             })
-
-
-
             ->pipe(function ($config) {
                 $this->MDataGridCfgExecutor->setButtonCfg();
             })

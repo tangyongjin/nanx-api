@@ -144,37 +144,17 @@ class DataGrid extends MY_Controller {
     }
 
     //再进行排序
+
+    $sql = " select  distinct  datagrid_code, column_field  from nanx_activity_column_order where datagrid_code='{$para['DataGridCode']}'  ";
+    $Array_display_order = $this->db->query($sql)->result_array();
+
     $ret['code'] = 200;
-    $ret['data'] =  $this->reorderDbColumns($actcode, $fixed);
+    $ret['data'] =  $this->MFieldcfg->_sortFieldDisplayOrder($fixed, $Array_display_order);
     echo json_encode($ret);
   }
 
 
-  public function reorderDbColumns($gridcode, $unSorted) {
-    $sql = " select  distinct  datagrid_code, column_field  from nanx_activity_column_order where datagrid_code='$gridcode'  ";
-    $rows = $this->db->query($sql)->result_array();
-    $sorted = [];
-    if (count($rows) == 0) {
-      return $unSorted;
-    }
-
-    foreach ($rows as  $row) {
-      $field = $row['column_field'];
-      foreach ($unSorted as  $key2 => $column) {
-        $field_not_sorted = $column['Field'];
-        if ($field_not_sorted == $field) {
-          $sorted[] = $unSorted[$key2];
-          continue;
-        }
-      }
-    }
-    return $sorted;
-  }
-
-
-
   public function saveTriggerGroup() {
-
     $ret = [];
     $post = file_get_contents('php://input');
     $para = (array) json_decode($post);
@@ -201,7 +181,6 @@ class DataGrid extends MY_Controller {
     $i = 1;
 
     foreach ($lines as $line) {
-
       $line = (array) $line;
       $tmp = [];
       $tmp['actcode'] = $actcode;

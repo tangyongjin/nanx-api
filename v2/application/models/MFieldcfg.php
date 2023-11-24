@@ -256,4 +256,30 @@ class MFieldcfg extends CI_Model {
 
         return    $uform_type;
     }
+
+
+
+    public function _sortFieldDisplayOrder($Array_all, $Array_display_order) {
+
+        $sortedArray_all = [];
+        foreach ($Array_display_order as $orderItem) {
+            $columnField = $orderItem['column_field'];
+
+            // 在 Array_all 中查找对应字段的配置
+            foreach ($Array_all as $item) {
+                if (isset($item['field_e']) && $item['field_e'] === $columnField) {
+                    $sortedArray_all[] = $item;
+                    break; // 找到对应字段后跳出循环
+                }
+            }
+        }
+
+        // 如果 Array_all 中有未包含在 Array_display_order 中的字段，添加到结果数组中
+        foreach ($Array_all as $item) {
+            if (!in_array($item, $sortedArray_all)) {
+                $sortedArray_all[] = $item;
+            }
+        }
+        return $sortedArray_all;
+    }
 }
