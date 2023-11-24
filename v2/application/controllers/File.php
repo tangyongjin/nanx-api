@@ -23,15 +23,13 @@ class File extends MY_Controller {
 
 
     $mobile = $this->getMobile();
-
-
-
-
     $uploadPath = '/var/www/html/upload';
     $date_folder = $this->create_date_folder($uploadPath);
 
     // 检查完毕.
     $files_from_client = [];
+
+
 
     foreach ($_FILES as $file) {
 

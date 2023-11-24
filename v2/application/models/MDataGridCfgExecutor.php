@@ -165,7 +165,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
                 }
             }
             if (!empty($col['editor_cfg']['trigger_cfg'])) {
-                $tmp['type'] = 'AssocSelect';   //强制指定下.
+                $tmp['type'] = 'UAssocSelect';   //强制指定下.
             }
             $tmp['x-props'] = $this->getXprops($all_cols, $col);
             $ret->{$col['field_e']} = $tmp;

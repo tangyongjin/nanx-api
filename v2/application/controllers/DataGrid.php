@@ -452,29 +452,6 @@ class DataGrid extends MY_Controller {
     echo json_encode($ret, JSON_UNESCAPED_UNICODE);
   }
 
-  public function batchUpdateFieldCfg() {
-    $ret = [];
-    $post = file_get_contents('php://input');
-    $para = (array) json_decode($post);
-    $datagrid_code = $para['datagrid_code'];
-    $base_table = $this->MDataGrid->getBaseTableByActcode($datagrid_code);
-    $submitData = $para['submitData'];
-    foreach ($submitData as   $one_filed_cfg) {
-      $this->saveFieldCfgHandler($datagrid_code, $base_table, (array) $one_filed_cfg);
-    }
-
-    $db_error = $this->db->error();
-    if ($db_error['code'] > 0) {
-      $ret['code'] = 500;
-      $ret['message'] = "字段配置保存失败:" . $db_error['message'];
-    } else {
-      $ret['code'] = 200;
-      $ret['message'] = "字段配置保存成功";
-    }
-    echo json_encode($ret, JSON_UNESCAPED_UNICODE);
-    die;
-  }
-
 
 
   public function getPortalDataGrids() {
