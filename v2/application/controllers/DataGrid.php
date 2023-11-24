@@ -21,7 +21,7 @@ class DataGrid extends MY_Controller {
 
 
 
-  public function saveActCodeColumnOrder() {
+  public function saveGridFieldOrder() {
     $args = (array) json_decode(file_get_contents("php://input"));
 
     $datagrid_code = $args['datagrid_code'];
@@ -115,7 +115,6 @@ class DataGrid extends MY_Controller {
       $tmp['default_v'] = null;
       $tmp['defaultv_para'] = null;
 
-
       $this->db->where(['datagrid_code' => $para['DataGridCode'], 'base_table' => $base_table, 'field_e' => $column['Field']]);
       $row = $this->db->get('nanx_biz_column_editor_cfg')->row_array();
       if ($row) {
@@ -141,14 +140,35 @@ class DataGrid extends MY_Controller {
       if ($row) {
         $tmp['category'] = $row['codetable_category_value'];
       }
-
-
       $fixed[] = $tmp;
     }
 
+    //再进行排序
     $ret['code'] = 200;
-    $ret['data'] =  $fixed;
+    $ret['data'] =  $this->reorderDbColumns($actcode, $fixed);
     echo json_encode($ret);
+  }
+
+
+  public function reorderDbColumns($gridcode, $unSorted) {
+    $sql = " select  distinct  datagrid_code, column_field  from nanx_activity_column_order where datagrid_code='$gridcode'  ";
+    $rows = $this->db->query($sql)->result_array();
+    $sorted = [];
+    if (count($rows) == 0) {
+      return $unSorted;
+    }
+
+    foreach ($rows as  $row) {
+      $field = $row['column_field'];
+      foreach ($unSorted as  $key2 => $column) {
+        $field_not_sorted = $column['Field'];
+        if ($field_not_sorted == $field) {
+          $sorted[] = $unSorted[$key2];
+          continue;
+        }
+      }
+    }
+    return $sorted;
   }
 
 

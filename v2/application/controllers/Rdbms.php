@@ -7,7 +7,10 @@ if (!defined('BASEPATH')) {
 class Rdbms extends MY_Controller {
 
     public function getTableColumnNames($table) {
-        $fields = $this->db->query("show full fields  from $table")->result_array();
+        $sql = "show full fields  from $table";
+        debug($sql);
+
+        $fields = $this->db->query($sql)->result_array();
         return $fields;
     }
 

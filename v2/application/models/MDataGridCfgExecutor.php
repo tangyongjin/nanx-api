@@ -89,6 +89,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         $base_table =   $this->payload['base_table'];
         $all_db_fields =    $this->db->query("show full fields  from $base_table")->result_array();
         $this->payload['total_cols_cfg']  = $this->MFieldcfg->getAllColsCfg($datagrid_code, $base_table, $all_db_fields);
+        // debug($this->payload['total_cols_cfg']);
     }
 
     public function  setColumnHiddenCols() {
@@ -104,7 +105,7 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
     }
 
 
-    public function setTableColumnConfig() {
+    public function setTableColumnRender() {
         $cols = [];
         foreach ($this->payload['total_cols_cfg']  as $col) {
             if (!in_array($col['field_e'], array_column($this->payload['gridHiddenColumns'], 'field'))) {
@@ -120,6 +121,32 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
             }
         }
         $this->payload['tableColumnConfig'] = $cols;
+    }
+
+
+
+
+    public function reorderColumns() {
+        $unSorted = $this->payload['total_cols_cfg'];
+        $gridcode = $this->payload['DataGridCode'];
+        $sql = " select  distinct  datagrid_code, column_field  from nanx_activity_column_order where datagrid_code='$gridcode'  ";
+        $rows = $this->db->query($sql)->result_array();
+        $sorted = [];
+        if (count($rows) == 0) {
+            return;
+        }
+
+        foreach ($rows as  $row) {
+            $field = $row['column_field'];
+            foreach ($unSorted as  $key2 => $column) {
+                $field_not_sorted = $column['field_e'];
+                if ($field_not_sorted == $field) {
+                    $sorted[] = $unSorted[$key2];
+                    continue;
+                }
+            }
+        }
+        $this->payload['total_cols_cfg'] = $sorted;
     }
 
 
