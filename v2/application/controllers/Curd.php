@@ -65,8 +65,8 @@ class Curd extends MY_Controller {
     public function addData() {
         $post = file_get_contents('php://input');
         $para = (array) json_decode($post);
-        $actcode = $para['DataGridCode'];
-        $act_table = $this->MDataGrid->getBaseTableByActcode($actcode);
+        $dataGridCode = $para['DataGridCode'];
+        $act_table = $this->MDataGrid->getBaseTableByActcode($dataGridCode);
 
 
         $flowInitMeta = [];
@@ -99,10 +99,10 @@ class Curd extends MY_Controller {
     public function updateData() {
         $post = file_get_contents('php://input');
         $para = (array) json_decode($post);
-        $actcode = $para['DataGridCode'];
+        $dataGridCode = $para['DataGridCode'];
         $para['rawdata'] = $this->fix_ghost((array) $para['rawdata']);
-        $para['table'] = $this->MDataGrid->getBaseTableByActcode($actcode);
-        $actcode = $para['DataGridCode'];
+        $para['table'] = $this->MDataGrid->getBaseTableByActcode($dataGridCode);
+        $dataGridCode = $para['DataGridCode'];
         $base_table = $para['table'];
         $rawData =  $para['rawdata'];
         $id = $rawData['id'];

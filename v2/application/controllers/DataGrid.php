@@ -61,7 +61,7 @@ class DataGrid extends MY_Controller {
     $post = file_get_contents('php://input');
     $para = (array) json_decode($post);
     $base_table = $this->MDataGrid->getBaseTableByActcode($para['DataGridCode']);
-    $actcode = $para['DataGridCode'];
+    $dataGridCode = $para['DataGridCode'];
     $full_columns = $this->db->query("show full fields  from $base_table ")->result_array();
     $fixed = [];
     $this->load->model('MFieldcfg');
@@ -73,7 +73,7 @@ class DataGrid extends MY_Controller {
 
 
       //强制的显示配置
-      $this->db->where(['datagrid_code' => $actcode, 'field_e' => $column['Field']]);
+      $this->db->where(['datagrid_code' => $dataGridCode, 'field_e' => $column['Field']]);
       $this->db->select(['field_c', 'field_width', 'label_width', 'show_as_pic', 'width', 'handler']);
       $row = $this->db->get('nanx_activity_field_special_display_cfg')->row_array();
 
@@ -160,7 +160,7 @@ class DataGrid extends MY_Controller {
     $para = (array) json_decode($post);
     $base_table = $this->MDataGrid->getBaseTableByActcode($para['DataGridCode']);
     $group_id = randstr(30);
-    $actcode = $para['DataGridCode'];
+    $dataGridCode = $para['DataGridCode'];
 
     if (intval($para['counter']) == 0) {
       $ret['code'] = 200;
@@ -183,7 +183,7 @@ class DataGrid extends MY_Controller {
     foreach ($lines as $line) {
       $line = (array) $line;
       $tmp = [];
-      $tmp['actcode'] = $actcode;
+      $tmp['actcode'] = $dataGridCode;
       $tmp['group_id'] = $group_id;
       $tmp['group_name'] = $para['group_name'];
       $tmp['base_table'] = $base_table;
@@ -216,9 +216,9 @@ class DataGrid extends MY_Controller {
     $ret = [];
     $post = file_get_contents('php://input');
     $para = (array) json_decode($post);
-    $actcode = $para['DataGridCode'];
+    $dataGridCode = $para['DataGridCode'];
 
-    $sql = "select distinct   group_name,group_id from nanx_biz_column_trigger_group where actcode='{$actcode}' ";
+    $sql = "select distinct   group_name,group_id from nanx_biz_column_trigger_group where actcode='{$dataGridCode}' ";
     $groups = $this->db->query($sql)->result_array();
     $data = [];
 
@@ -260,10 +260,10 @@ class DataGrid extends MY_Controller {
     $ret = [];
     $post = file_get_contents('php://input');
     $para = (array) json_decode($post);
-    $actcode = $para['DataGridCode'];
+    $dataGridCode = $para['DataGridCode'];
     //得到流程对应表
-    $base_table = $this->MDataGrid->getBaseTableByActcode($actcode);
-    $this->saveFieldCfgHandler($actcode, $base_table, $para);
+    $base_table = $this->MDataGrid->getBaseTableByActcode($dataGridCode);
+    $this->saveFieldCfgHandler($dataGridCode, $base_table, $para);
 
     $db_error = $this->db->error();
     if ($db_error['code'] > 0) {
@@ -278,37 +278,37 @@ class DataGrid extends MY_Controller {
   }
 
 
-  public function saveFieldCfgHandler($actcode, $base_table, $para) {
+  public function saveFieldCfgHandler($dataGridCode, $base_table, $para) {
 
 
     // 修改  label
-    $this->_saveFieldLabelHandler($actcode, $base_table, $para);
+    $this->_saveFieldLabelHandler($dataGridCode, $base_table, $para);
 
 
     // 列 render
-    $this->_saveFieldColRenderHandler($actcode, $base_table, $para);
+    $this->_saveFieldColRenderHandler($dataGridCode, $base_table, $para);
 
 
     // 列  编辑配置
-    $this->_saveFieldColmnEditorHandler($actcode, $base_table, $para);
+    $this->_saveFieldColmnEditorHandler($dataGridCode, $base_table, $para);
 
 
     // 列隐藏设置
-    $this->_saveFieldHiddenConfigure($actcode, $para);
+    $this->_saveFieldHiddenConfigure($dataGridCode, $para);
 
     // 字典表配置
-    $this->_saveFieldCategeoryHandler($actcode, $base_table, $para);
+    $this->_saveFieldCategeoryHandler($dataGridCode, $base_table, $para);
 
     // 初始值配置
-    $this->_saveFieldInitValueHandler($actcode, $base_table, $para);
+    $this->_saveFieldInitValueHandler($dataGridCode, $base_table, $para);
   }
 
 
-  private function _saveFieldLabelHandler($actcode, $base_table, $para) {
+  private function _saveFieldLabelHandler($dataGridCode, $base_table, $para) {
 
     // 修改  label
     if (strlen($para['label']) > 1) {
-      $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
+      $wherecfg = ['datagrid_code' => $dataGridCode,  'base_table' => $base_table,  'field_e' => $para['Field']];
       $rows = $this->db->get_where('nanx_activity_field_special_display_cfg', $wherecfg)->result_array();
       if (count($rows) == 1) {
         $this->db->update('nanx_activity_field_special_display_cfg', ['field_c' => $para['label']], $wherecfg);
@@ -322,10 +322,10 @@ class DataGrid extends MY_Controller {
 
   // 列 render
 
-  private function _saveFieldColRenderHandler($actcode, $base_table, $para) {
+  private function _saveFieldColRenderHandler($dataGridCode, $base_table, $para) {
 
     if (strlen($para['handler']) > 1) {
-      $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
+      $wherecfg = ['datagrid_code' => $dataGridCode,  'base_table' => $base_table,  'field_e' => $para['Field']];
       $rows = $this->db->get_where('nanx_activity_field_special_display_cfg', $wherecfg)->result_array();
       if (count($rows) == 1) {
         $this->db->update('nanx_activity_field_special_display_cfg', ['handler' => $para['handler']], $wherecfg);
@@ -336,7 +336,7 @@ class DataGrid extends MY_Controller {
     }
 
     if (strlen($para['handler']) == 0) {
-      $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
+      $wherecfg = ['datagrid_code' => $dataGridCode,  'base_table' => $base_table,  'field_e' => $para['Field']];
       $this->db->update('nanx_activity_field_special_display_cfg', ['handler' => null], $wherecfg);
     }
   }
@@ -344,8 +344,8 @@ class DataGrid extends MY_Controller {
 
   // 列 编辑 handler
 
-  private function _saveFieldColmnEditorHandler($actcode, $base_table, $para) {
-    $wherecfg = ['datagrid_code' => $actcode,  'base_table' => $base_table,  'field_e' => $para['Field']];
+  private function _saveFieldColmnEditorHandler($dataGridCode, $base_table, $para) {
+    $wherecfg = ['datagrid_code' => $dataGridCode,  'base_table' => $base_table,  'field_e' => $para['Field']];
     $rows = $this->db->get_where('nanx_biz_column_editor_cfg', $wherecfg)->result_array();
     if (count($rows) == 1) {
       $this->db->update(
@@ -370,10 +370,10 @@ class DataGrid extends MY_Controller {
   }
 
   // 列隐藏设置
-  private function _saveFieldHiddenConfigure($actcode, $para) {
+  private function _saveFieldHiddenConfigure($dataGridCode, $para) {
 
     //form 是否隐藏
-    $wherecfg = ['datagrid_code' => $actcode,   'field' => $para['Field'], 'forbidden_type' => 'form_hidden'];
+    $wherecfg = ['datagrid_code' => $dataGridCode,   'field' => $para['Field'], 'forbidden_type' => 'form_hidden'];
 
     $this->db->where($wherecfg);
     $this->db->delete('nanx_activity_forbidden_field');
@@ -382,7 +382,7 @@ class DataGrid extends MY_Controller {
     }
 
     //table 是否隐藏
-    $wherecfg = ['datagrid_code' => $actcode,   'field' => $para['Field'], 'forbidden_type' => 'column_hidden'];
+    $wherecfg = ['datagrid_code' => $dataGridCode,   'field' => $para['Field'], 'forbidden_type' => 'column_hidden'];
     $this->db->where($wherecfg);
     $this->db->delete('nanx_activity_forbidden_field');
 
@@ -391,11 +391,11 @@ class DataGrid extends MY_Controller {
     }
   }
 
-  private function _saveFieldCategeoryHandler($actcode, $base_table, $para) {
+  private function _saveFieldCategeoryHandler($dataGridCode, $base_table, $para) {
     // 字典表配置
     if (strlen($para['category']) > 1) {
 
-      $wherecfg = ['actcode' => $actcode, 'base_table' => $base_table, 'field_e' => $para['Field'], 'combo_table' => 'nanx_code_table'];
+      $wherecfg = ['actcode' => $dataGridCode, 'base_table' => $base_table, 'field_e' => $para['Field'], 'combo_table' => 'nanx_code_table'];
       $this->db->where($wherecfg);
       $this->db->delete('nanx_biz_column_trigger_group');
 
@@ -412,7 +412,7 @@ class DataGrid extends MY_Controller {
   }
 
 
-  private function  _saveFieldInitValueHandler($actcode, $base_table, $para) {
+  private function  _saveFieldInitValueHandler($dataGridCode, $base_table, $para) {
   }
 
 

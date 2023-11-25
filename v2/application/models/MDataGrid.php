@@ -19,8 +19,8 @@ class MDataGrid extends CI_Model {
     return $sqltype;
   }
 
-  function  getBaseTableByActcode($actcode) {
-    $this->db->where('datagrid_code', $actcode);
+  function  getBaseTableByActcode($dataGridCode) {
+    $this->db->where('datagrid_code', $dataGridCode);
     $row = $this->db->get_where('nanx_activity')->row_array();
     return $row['base_table'];
   }
