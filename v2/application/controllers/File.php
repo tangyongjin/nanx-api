@@ -112,7 +112,7 @@ class File extends MY_Controller {
 
     // 后缀检查,不使用mime_content_type, mime_content_type 可能有错误返回.
     $image_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ico', 'icon'];  //图片
-    $office_extensions = ['pdf', 'txt', 'doc', 'docx', 'xls', 'xlsx', 'ppt']; // 办公文档
+    $office_extensions = ['pdf', 'txt', 'doc', 'docx', 'xls', 'csv', 'xlsx', 'ppt']; // 办公文档
     $all_extensions = array_merge($image_extensions, $office_extensions);
     if ($upload_action === 'avatar') {
       if (!in_array($extension, $image_extensions)) {
