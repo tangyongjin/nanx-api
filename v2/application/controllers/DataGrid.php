@@ -109,7 +109,7 @@ class DataGrid extends MY_Controller {
 
       //nanx_biz_column_editor_cfg ,控制 是否只读/插件名称
 
-      $tmp['pluginname'] = $this->MFieldcfg->toUnformType($column['Type']);
+      $tmp['plugid'] = $this->MFieldcfg->toUnformType($column['Type']);
       $tmp['readonly'] = false;
       $tmp['uform_para'] = null;
       $tmp['default_v'] = null;
@@ -124,7 +124,7 @@ class DataGrid extends MY_Controller {
         }
 
         if (strlen($row['uform_plugin']) > 3) {
-          $tmp['pluginname'] = $row['uform_plugin'];
+          $tmp['plugid'] = $row['uform_plugin'];
         }
 
         $tmp['uform_para'] = $row['uform_para'];
@@ -355,7 +355,7 @@ class DataGrid extends MY_Controller {
           'default_v' => $para['default_v'],
           'defaultv_para' => $para['defaultv_para'],
           'uform_para' => $para['uform_para'],
-          'uform_plugin' => $para['pluginname']
+          'uform_plugin' => $para['plugid']
         ],
         $wherecfg
       );
@@ -363,7 +363,7 @@ class DataGrid extends MY_Controller {
 
       $wherecfg['readonly'] = $para['readonly'];
       $wherecfg['default_v'] =  $para['default_v'];
-      $wherecfg['uform_plugin'] = $para['pluginname'];
+      $wherecfg['uform_plugin'] = $para['plugid'];
       $wherecfg['uform_para'] = $para['uform_para'];
       $this->db->insert('nanx_biz_column_editor_cfg', $wherecfg);
     }
