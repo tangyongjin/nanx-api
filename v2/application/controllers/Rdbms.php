@@ -8,7 +8,6 @@ class Rdbms extends MY_Controller {
 
     public function getTableColumnNames($table) {
         $sql = "show full fields  from $table";
-        debug($sql);
 
         $fields = $this->db->query($sql)->result_array();
         return $fields;

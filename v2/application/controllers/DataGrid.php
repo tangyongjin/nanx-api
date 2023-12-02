@@ -56,7 +56,6 @@ class DataGrid extends MY_Controller {
   //所有字段的配置,包括 label, 是否隐藏(form,column),是否只读,插件,字典表
   public function getColsDbInfo() {
 
-
     $ret = [];
     $post = file_get_contents('php://input');
     $para = (array) json_decode($post);
@@ -454,7 +453,6 @@ class DataGrid extends MY_Controller {
 
 
   public function getPortalDataGrids() {
-    $this->db->where('portaluse', 'y');
     $this->db->order_by('id', 'desc');
     $grids = $this->db->get('nanx_activity')->result_array();
     $ret = [];
