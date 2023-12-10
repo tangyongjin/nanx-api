@@ -361,3 +361,15 @@ function bcsum(array $numbers) {
   }
   return $total;
 }
+
+
+function paginateRows($rows, $pageSize, $currentPage) {
+  // Ensure currentPage is within bounds
+  $currentPage = max(1, min($currentPage, ceil(count($rows) / $pageSize)));
+
+  // Calculate the offset
+  $offset = ($currentPage - 1) * $pageSize;
+
+  // Return the subset of rows for the current page
+  return array_slice($rows, $offset, $pageSize);
+}

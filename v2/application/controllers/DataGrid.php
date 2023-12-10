@@ -54,14 +54,33 @@ class DataGrid extends MY_Controller {
 
 
   //所有字段的配置,包括 label, 是否隐藏(form,column),是否只读,插件,字典表
-  public function getColsDbInfo() {
+  public function getGridFieldConfig() {
 
     $ret = [];
     $post = file_get_contents('php://input');
     $para = (array) json_decode($post);
-    $base_table = $this->MDataGrid->getBaseTableByActcode($para['DataGridCode']);
+
+
     $dataGridCode = $para['DataGridCode'];
-    $full_columns = $this->db->query("show full fields  from $base_table ")->result_array();
+    $this->db->where('datagrid_code', $dataGridCode);
+    $tmp = $this->db->get('nanx_activity')->row_array();
+    if ($tmp['datagrid_type'] == 'table') {
+      $base_table = $this->MDataGrid->getBaseTableByActcode($para['DataGridCode']);
+      $full_columns = $this->db->query("show full fields  from $base_table ")->result_array();
+    } else {
+      $base_table = null;
+      $str = $tmp['service_fields'];
+      $cols = json_decode($str, true);
+      $full_columns = [];
+      foreach ($cols as $_col) {
+        $full_columns[] = ['Field' => $_col, 'Type' => 'string', 'Comment' => $_col];
+      }
+    }
+
+
+
+
+
     $fixed = [];
     $this->load->model('MFieldcfg');
     foreach ($full_columns as $column) {

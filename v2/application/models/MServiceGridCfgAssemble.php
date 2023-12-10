@@ -10,10 +10,10 @@ if (!defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
 
-class MDataGridCfgAssemble extends CI_Model {
+class MServiceGridCfgAssemble extends CI_Model {
     public function __construct() {
         parent::__construct();
-        $this->load->model('MDataGridCfgExecutor');
+        $this->load->model('MServiceGridCfgExecutor');
     }
 
     public function  PipeRunner($cfg) {
@@ -21,41 +21,40 @@ class MDataGridCfgAssemble extends CI_Model {
         $pipeline = (new Pipeline())
 
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->init($config);
+                $this->MServiceGridCfgExecutor->init($config);
             })
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->setGridMeta($config);
+                $this->MServiceGridCfgExecutor->setGridMeta($config);
             })
             ->pipe(function ($config) {
-                // 获取  editor_cfg, display_cfg
-                $this->MDataGridCfgExecutor->setTotalColsCfg();
-            })
-
-            ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->reorderColumns();
+                $this->MServiceGridCfgExecutor->setTotalColsCfg();
             })
 
+            ->pipe(function ($config) {
+                $this->MServiceGridCfgExecutor->reorderColumns();
+            })
+
 
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->setColumnHiddenCols();
+                $this->MServiceGridCfgExecutor->setColumnHiddenCols();
             })
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->setFormHiddenCols();
+                $this->MServiceGridCfgExecutor->setFormHiddenCols();
             })
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->setTableColumnRender();
+                $this->MServiceGridCfgExecutor->setTableColumnRender();
             })
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->setFormUsedColumns();
+                $this->MServiceGridCfgExecutor->setFormUsedColumns();
             })
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->setUFormConfig();
+                $this->MServiceGridCfgExecutor->setUFormConfig();
             })
             ->pipe(function ($config) {
-                $this->MDataGridCfgExecutor->setButtonCfg();
+                $this->MServiceGridCfgExecutor->setButtonCfg();
             })
             ->pipe(function () {
-                return $this->MDataGridCfgExecutor->getter();
+                return $this->MServiceGridCfgExecutor->getter();
             });
 
         $salaryResult = $pipeline->process($cfg);

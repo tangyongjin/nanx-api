@@ -24,4 +24,14 @@ class MDataGrid extends CI_Model {
     $row = $this->db->get_where('nanx_activity')->row_array();
     return $row['base_table'];
   }
+
+
+  public function callerIncaller($url, $para) {
+    $c_and_m = explode('/', $url);
+    $c = $c_and_m[0];
+    $m = $c_and_m[1];
+    $this->load->model($c);
+    $result = $this->$c->$m($para);
+    return $result;
+  }
 }

@@ -27,7 +27,17 @@ class DataGridCfg extends MY_Controller {
     $para = (array) json_decode(file_get_contents("php://input"));
     $res = [];
     $res['code'] = 200;
-    $res['data'] = $this->MDataGridCfgAssemble->PipeRunner($para);
-    echo json_encode($res, JSON_UNESCAPED_UNICODE);
+
+    $this->db->where('datagrid_code', $para['DataGridCode']);
+    $tmp = $this->db->get('nanx_activity')->row_array();
+    if ($tmp['datagrid_type'] == 'table') {
+      $res['data'] = $this->MTableGridCfgAssemble->PipeRunner($para);
+      echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    }
+
+    if ($tmp['datagrid_type'] == 'service') {
+      $res['data'] = $this->MServiceGridCfgAssemble->PipeRunner($para);
+      echo json_encode($res, JSON_UNESCAPED_UNICODE);
+    }
   }
 }

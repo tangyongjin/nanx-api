@@ -126,7 +126,6 @@ class Codecleaner extends CI_Controller {
 
         $search_tables = [
             'nanx_activity',
-            'nanx_activity_a2a_btns',
             'nanx_activity_biz_layout',
             'nanx_activity_column_order',
             'nanx_activity_field_public_display_cfg',

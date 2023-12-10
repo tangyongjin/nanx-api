@@ -46,7 +46,7 @@ class Curd extends MY_Controller {
 
         $para = (array) json_decode(file_get_contents("php://input"));
         $para['pageSize'] = 1000;
-        $actcfg = $this->MDataGridCfgAssemble->PipeRunner($para);
+        $actcfg = $this->MTableGridCfgAssemble->PipeRunner($para);
         $cols = $actcfg['tableColumnConfig'];
         $get_data_config = [
             'DataGridCode' => $para['DataGridCode'],
@@ -316,6 +316,29 @@ class Curd extends MY_Controller {
         $ret = [];
         $ret['value'] = '1984' . randstr(10);
         $ret['code'] = 200;
+        echo json_encode($ret);
+    }
+
+    public function serviceFetchData() {
+        $post = file_get_contents('php://input');
+        $para = (array) json_decode($post);
+
+
+        $rows = $this->MDataGrid->callerIncaller($para['serviceUrl'], $para);
+        // debug($rows);
+        $currentPage = $para['currentPage'];
+        $pageSize = $para['pageSize'];
+        $currentPageRows = paginateRows($rows, $pageSize, $currentPage);
+        // return ['total'=>$total,$currentPageRows;
+
+
+
+
+        $ret = [];
+        $ret['code'] = 200;
+        $ret['data'] = $currentPageRows;
+        $ret['total'] = count($rows);
+        $ret['rows'] = count($currentPageRows);
         echo json_encode($ret);
     }
 }

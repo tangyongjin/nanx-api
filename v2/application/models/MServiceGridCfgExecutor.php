@@ -3,7 +3,7 @@
 use League\Pipeline\Pipeline;
 use League\Pipeline\StageInterface;
 
-class MDataGridCfgExecutor extends CI_Model implements StageInterface {
+class MServiceGridCfgExecutor extends CI_Model implements StageInterface {
     public $payload = [];
     public function __invoke($cfg) {
         return $cfg;
@@ -46,11 +46,15 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         $this->payload['base_table'] = $tmp['base_table'];
         $this->payload['fixed_query_cfg'] =  $tmp['fixed_query_cfg'];
         $this->payload['datagrid_title'] = $tmp['datagrid_title'];
+        $this->payload['service_fields'] = $tmp['service_fields'];
         $this->payload['tips'] = $tmp['tips'];
         $this->payload['referino'] = [];
-        $this->payload['curd']['geturl'] =  $tmp['geturl'];
+        $this->payload['curd']['geturl'] = $tmp['service_url'];
         $this->payload['curd']['addurl'] = $tmp['addurl'];
         $this->payload['curd']['delurl'] = $tmp['delurl'];
+        $this->payload['curd']['service_url'] = $tmp['service_url'];
+
+
         $this->payload['curd']['updateurl'] = $tmp['updateurl'];
     }
 
@@ -82,14 +86,25 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
     }
 
 
+    private function jsonAsTable() {
+
+
+        $str = $this->payload['service_fields'];
+        $cols = json_decode($str, true);
+
+
+        $arr = [];
+        foreach ($cols as  $oneCol) {
+
+            $_tmp = ['field_e' => $oneCol, 'display_cfg' => ['field_c' => $oneCol]];
+            $arr[] = $_tmp;
+        }
+        return $arr;
+    }
+
 
     public function  setTotalColsCfg() {
-
-        $datagrid_code =    $this->payload['DataGridCode'];
-        $base_table =   $this->payload['base_table'];
-        $all_db_fields =    $this->db->query("show full fields  from $base_table")->result_array();
-        $this->payload['total_cols_cfg']  = $this->MFieldcfg->getAllColsCfg($datagrid_code, $base_table, $all_db_fields);
-        // debug($this->payload['total_cols_cfg']);
+        $this->payload['total_cols_cfg']  = $this->jsonAsTable();
     }
 
     public function  setColumnHiddenCols() {
@@ -167,37 +182,16 @@ class MDataGridCfgExecutor extends CI_Model implements StageInterface {
         foreach ($all_cols as $col) {
 
             $tmp = [];
-            $tmp['type'] = $col['editor_cfg']['uform_plugin'];
+            $tmp['type'] = 'string';
             $tmp['title'] = $col['display_cfg']['field_c'];
-            $tmp['required'] = $col['editor_cfg']['null_option']  == 'NO' ? true : false;    //是否必填项
+            $tmp['required'] = false;
             $tmp['editable'] = true;
-            if (array_key_exists('readonly', $col['editor_cfg'])) {
-                if (intval($col['editor_cfg']['readonly']) == 1) {
-                    $tmp['editable'] = false;
-                }
-            }
-            if (!empty($col['editor_cfg']['trigger_cfg'])) {
-                $tmp['type'] = 'UAssocSelect';   //强制指定下.
-            }
-            $tmp['x-props'] = $this->getXprops($all_cols, $col);
+            $tmp['x-props'] =  null;
             $ret->{$col['field_e']} = $tmp;
         }
         return $ret;
     }
 
-
-    public function getXprops($all_cols, $col) {
-        if (empty($col['editor_cfg']['trigger_cfg'])) {
-            $xprops = ['field_id' => $col['field_e'], 'uform_para' => $col['editor_cfg']['uform_para']];
-        } else {
-            $xprops = $this->getTriggerXprops($all_cols, $col);
-        }
-
-        $xprops['default_v'] = $col['editor_cfg']['default_v'];
-        $xprops['defaultv_para'] = $col['editor_cfg']['defaultv_para'];
-
-        return  $xprops;
-    }
 
     public function getTriggerXprops($all_cols, $col) {
 
