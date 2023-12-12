@@ -73,8 +73,7 @@ class Auth extends MY_Controller {
 
 
   public function loginMobile() {
-    // sleep(1);
-    // logtext("进入登陆");
+    // sleep(3);
     $json_paras = (array) json_decode(file_get_contents('php://input'));
 
     if (!array_key_exists('mobile', $json_paras)) {
