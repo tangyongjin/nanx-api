@@ -78,7 +78,11 @@ class MTableGridCfgExecutor extends CI_Model implements StageInterface {
         foreach ($specialbtns as $value) {
             $btns[] = $value;
         }
+
+        // $_simpleBtns   = ['BtnEditor.js'];
         $this->payload['buttons'] =  $btns;
+        // $this->payload['buttons'] =  $_simpleBtns;
+        // $this->payload['buttons'] =  $btns;
     }
 
 
