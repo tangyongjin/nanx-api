@@ -167,6 +167,8 @@ class DataGrid extends MY_Controller {
     $Array_display_order = $this->db->query($sql)->result_array();
 
     $ret['code'] = 200;
+    $ret['sorted'] = $sql;
+
     $ret['data'] =  $this->MFieldcfg->_sortFieldDisplayOrder($fixed, $Array_display_order);
     echo json_encode($ret);
   }

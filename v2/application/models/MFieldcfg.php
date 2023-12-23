@@ -7,10 +7,19 @@ class MFieldcfg extends CI_Model {
         foreach ($all_db_fields as $db_field) {
             $tmp_cfg =  [];
             $tmp_cfg['field_e']     = $db_field['Field'];
+            // 给排序用的字段
+            $tmp_cfg['Field']     = $db_field['Field'];
             $tmp_cfg['display_cfg'] = $this->getDisplayCfg($datagrid_code, $db_field);
             $tmp_cfg['editor_cfg']  = $this->getEditorCfg($datagrid_code, $base_table, $db_field);
             $col_cfg[]              = $tmp_cfg;
         }
+        // _sortFieldDisplayOrder
+
+
+        $sql = " select  distinct  datagrid_code, column_field  from nanx_activity_column_order where datagrid_code='{$datagrid_code}'  ";
+        $Array_display_order = $this->db->query($sql)->result_array();
+        $col_cfg =  $this->MFieldcfg->_sortFieldDisplayOrder($col_cfg, $Array_display_order);
+
         return $col_cfg;
     }
 
@@ -259,15 +268,15 @@ class MFieldcfg extends CI_Model {
 
 
 
+    // 对 $Array_all 用 $Array_display_order 进行排序
     public function _sortFieldDisplayOrder($Array_all, $Array_display_order) {
 
         $sortedArray_all = [];
         foreach ($Array_display_order as $orderItem) {
-            $columnField = $orderItem['column_field'];
 
             // 在 Array_all 中查找对应字段的配置
             foreach ($Array_all as $item) {
-                if (isset($item['field_e']) && $item['field_e'] === $columnField) {
+                if (isset($item['Field']) && ($item['Field'] == $orderItem['column_field'])) {
                     $sortedArray_all[] = $item;
                     break; // 找到对应字段后跳出循环
                 }
@@ -280,6 +289,7 @@ class MFieldcfg extends CI_Model {
                 $sortedArray_all[] = $item;
             }
         }
+
         return $sortedArray_all;
     }
 }

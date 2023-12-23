@@ -23,7 +23,7 @@ class DataGridCfg extends MY_Controller {
 
 
   public function fetchDataGridCfg() {
-
+    // sleep(5);
     $para = (array) json_decode(file_get_contents("php://input"));
     $res = [];
     $res['code'] = 200;

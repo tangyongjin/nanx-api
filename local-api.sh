@@ -1,5 +1,5 @@
 echo "brew services  start mysql" 
-
+echo "/usr/local/Cellar/mysql/8.2.0_1.reinstall/bin/mysqld"
 
 echo "Modify IP of v2/application/config/database.php "
 

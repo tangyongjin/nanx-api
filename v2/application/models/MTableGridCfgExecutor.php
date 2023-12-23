@@ -93,8 +93,6 @@ class MTableGridCfgExecutor extends CI_Model implements StageInterface {
         $base_table =   $this->payload['base_table'];
         $all_db_fields =    $this->db->query("show full fields  from $base_table")->result_array();
         $this->payload['total_cols_cfg']  = $this->MFieldcfg->getAllColsCfg($datagrid_code, $base_table, $all_db_fields);
-        // debug($this->payload['total_cols_cfg']);
-        // die;
     }
 
     public function  setColumnHiddenCols() {
