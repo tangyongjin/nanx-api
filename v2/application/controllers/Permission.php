@@ -202,7 +202,7 @@ class Permission extends MY_Controller {
 
 
   public function deleteUserRoleHandler($user, $role) {
-    $data = ['user' => $user, 'role_code' => $role];
+    $data = ['user' => $user];
     $this->db->where($data);
     $this->db->delete('nanx_user_role_assign');
   }
